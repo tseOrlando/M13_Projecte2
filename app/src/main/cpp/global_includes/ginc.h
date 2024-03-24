@@ -21,5 +21,6 @@
 #include <regex>
 
 #include "../../../imgui.h"
+#include "../menu/headers/wtools/wtools.h"
 
 #endif //HARD_MOTION_GINC_H

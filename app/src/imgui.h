@@ -282,6 +282,17 @@ struct ImVec4
     float                                                     x, y, z, w;
     constexpr ImVec4()                                        : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
     constexpr ImVec4(float _x, float _y, float _z, float _w)  : x(_x), y(_y), z(_z), w(_w) { }
+
+    static ImVec4 FromRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+    {
+        ImVec4 vec = ImVec4();
+        vec.x = r / 255.0f;
+        vec.y = g / 255.0f;
+        vec.z = b / 255.0f;
+        vec.w = a / 255.0f;
+        return vec;
+    }
+
 #ifdef IM_VEC4_CLASS_EXTRA
     IM_VEC4_CLASS_EXTRA     // Define additional constructors and implicit cast operators in imconfig.h to convert back and forth between your math types and ImVec4.
 #endif

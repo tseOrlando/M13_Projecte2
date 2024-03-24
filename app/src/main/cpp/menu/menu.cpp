@@ -16,12 +16,12 @@ void menu::spawn() noexcept
     ImVec2 display_size = ImGui::GetIO().DisplaySize;
 
     // Align the window to the display size entirely
-    ImGui::SetNextWindowPos(ImVec2(-5, -5));
-    ImGui::SetNextWindowSize(ImVec2(display_size.x + 10, display_size.y + 10));
+    ImGui::SetNextWindowPos(ImVec2(-3, -3));
+    ImGui::SetNextWindowSize(ImVec2(display_size.x + 5, display_size.y + 5));
 
     ImGui::Begin("Hard Motion", nullptr, flags);
 
-    ImGui::Text("HARD MOTION");
+    widgets::upper_title("hard motion");
 
     ImGui::End();
 
@@ -40,10 +40,10 @@ void menu::load_style() noexcept
 
     ImFontConfig icons_config;
     icons_config.FontDataOwnedByAtlas = false;
-    icons_config.MergeMode = true;
-    icons_config.PixelSnapH = true;
-    icons_config.OversampleH = static_cast<int>(2.5);
-    icons_config.OversampleV = static_cast<int>(2.5);
+    icons_config.MergeMode            = true;
+    icons_config.PixelSnapH           = true;
+    icons_config.OversampleH          = static_cast<int>(2.5);
+    icons_config.OversampleV          = static_cast<int>(2.5);
 
     ImVec2 display_size = ImGui::GetIO().DisplaySize;
 
@@ -53,11 +53,40 @@ void menu::load_style() noexcept
 
     static const unsigned short icons_ranges[] = { 0xe005, 0xf8ff, 0 };
 
-    menu::font::head = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size + 20);
-    io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 15, &icons_config, icons_ranges);
+    menu::font::head = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size + 100.f);
+    io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 15.f, &icons_config, icons_ranges);
 
     menu::font::body = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size);
-    io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 35, &icons_config, icons_ranges);
-
-    ImGui::GetStyle().ScaleAllSizes(3.0f);
+    io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 35.f, &icons_config, icons_ranges);
 }
+
+/*
+ * Memory based head and body fonts wrapped in 1 function in order to operate fast
+ */
+void menu::widgets::head_text(const std::string& text) noexcept { wtools::resize_text(font::head, text); }
+void menu::widgets::body_text(const std::string& text) noexcept { wtools::resize_text(font::body, text); }
+
+/*
+ * This represents the big title on every tab seen in Hard Motion.
+ *
+ * The BeginChild text will have a '###'.
+ *
+ * If I called this function 2 times or more it would mix things up.
+ * But since I will use once per tab it's ok to have it like that
+ */
+void menu::widgets::upper_title(const std::string &text) noexcept
+{
+    float extra_size = 30.f;
+
+    ImVec2 text_size = ImGui::CalcTextSize(text.c_str());
+    ImVec2 child_window_size(text_size.x + extra_size * 2, text_size.y + extra_size);
+
+    ImGui::SetCursorPos(ImVec2((ImGui::GetWindowSize().x - child_window_size.x) * 0.5f, 125));
+    ImGui::BeginChild("###", child_window_size);
+
+    ImGui::SetCursorPosX(extra_size);
+    head_text(text);
+
+    ImGui::EndChild();
+}
+
