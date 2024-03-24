@@ -1,5 +1,5 @@
 //
-// Created by paulo on 21/03/2024.
+// Created by sel on 21/03/2024.
 //
 
 #ifndef HARD_MOTION_MANROPE_H

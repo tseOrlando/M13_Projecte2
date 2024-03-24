@@ -230,6 +230,21 @@ void ImGui::StyleColorsDark(ImGuiStyle* dst)
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
     colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+
+    style->TabRounding = 5;
+    style->GrabRounding = 5;
+    style->ScrollbarRounding = 5;
+    style->WindowRounding = 5;
+    style->ChildRounding = 5;
+    style->PopupRounding = 5;
+    style->FrameRounding = 5;
+
+    style->WindowBorderSize = 4;
+    style->FrameBorderSize = 4;
+    style->PopupBorderSize = 4;
+    style->ChildBorderSize = 4;
+    style->SeparatorTextBorderSize = 4;
+    style->TabBorderSize = 4;
 }
 
 void ImGui::StyleColorsClassic(ImGuiStyle* dst)

@@ -1,9 +1,13 @@
 //
-// Created by paulo on 21/03/2024.
+// Created by sel on 21/03/2024.
 //
 
 #ifndef HARD_MOTION_GINC_H
 #define HARD_MOTION_GINC_H
+
+/*
+ * In order to not be redundant, add the needed libraries in common in one file!
+ */
 
 #include <vector>
 #include <string>

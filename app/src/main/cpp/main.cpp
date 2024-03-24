@@ -142,17 +142,10 @@ void Init(struct android_app* app)
     g_IniFilename = std::string(app->activity->internalDataPath) + "/imgui.ini";
     io.IniFilename = g_IniFilename.c_str();;
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-
     ImGui_ImplAndroid_Init(g_App->window);
     ImGui_ImplOpenGL3_Init("#version 300 es");
 
-    ImFontConfig font_cfg;
-    font_cfg.SizePixels = 22.0f;
-    io.Fonts->AddFontDefault(&font_cfg);
-
-    ImGui::GetStyle().ScaleAllSizes(3.0f);
+    menu::load_style();
 
     g_Initialized = true;
 }
