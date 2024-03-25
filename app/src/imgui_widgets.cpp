@@ -690,6 +690,19 @@ bool ImGui::ButtonBehavior(const ImRect& bb, ImGuiID id, bool* out_hovered, bool
     return pressed;
 }
 
+/*
+ * Ported from my old Autoclicker named 'selack' where I had my own style
+ */
+
+#include "../../../app/src/main/cpp/menu/headers/menu.h"
+
+struct button_animation
+{
+    float closing_anim;
+    float closing_alpha;
+    float label_alpha;
+};
+
 bool ImGui::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags flags)
 {
     ImGuiWindow* window = GetCurrentWindow();
@@ -700,32 +713,69 @@ bool ImGui::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags
     const ImGuiStyle& style = g.Style;
     const ImGuiID id = window->GetID(label);
     const ImVec2 label_size = CalcTextSize(label, NULL, true);
+    ImDrawList* draw = GetWindowDrawList();
+
+
+    static std::map<ImGuiID, button_animation> anim;
+    auto it_anim = anim.find(id);
+
+    if (it_anim == anim.end())
+    {
+        anim.insert({ id, {0.f, 0.f, 0.f} });
+        it_anim = anim.find(id);
+    }
 
     ImVec2 pos = window->DC.CursorPos;
-    if ((flags & ImGuiButtonFlags_AlignTextBaseLine) && style.FramePadding.y < window->DC.CurrLineTextBaseOffset) // Try to vertically align buttons that are smaller/have no padding so that text baseline matches (bit hacky, since it shouldn't be a flag)
+
+    if ((flags & ImGuiButtonFlags_AlignTextBaseLine) && style.FramePadding.y < window->DC.CurrLineTextBaseOffset)
         pos.y += window->DC.CurrLineTextBaseOffset - style.FramePadding.y;
+
     ImVec2 size = CalcItemSize(size_arg, label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 2.0f);
 
     const ImRect bb(pos, pos + size);
+
     ItemSize(size, style.FramePadding.y);
+
     if (!ItemAdd(bb, id))
         return false;
+
+    if (g.LastItemData.InFlags & ImGuiItemFlags_ButtonRepeat)
+        flags |= ImGuiButtonFlags_Repeat;
 
     bool hovered, held;
     bool pressed = ButtonBehavior(bb, id, &hovered, &held, flags);
 
-    // Render
-    const ImU32 col = GetColorU32((held && hovered) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
-    RenderNavHighlight(bb, id);
-    RenderFrame(bb.Min, bb.Max, col, true, style.FrameRounding);
+    it_anim->second.closing_anim = ImLerp(it_anim->second.closing_anim, (hovered || held ? size.x / 1.9f : 0), g.IO.DeltaTime * 9.f);
 
+    if (hovered)
+    {
+        it_anim->second.label_alpha = ImLerp(it_anim->second.label_alpha, 255.f, 0.1f);
+        it_anim->second.closing_alpha = ImLerp(it_anim->second.closing_alpha, 255.f, 0.1f);
+    }
+    else
+    {
+        it_anim->second.label_alpha = ImLerp(it_anim->second.label_alpha, 0.f, 0.1f);
+        it_anim->second.closing_alpha = ImLerp(it_anim->second.closing_alpha, 0.f, 0.1f);
+    }
+
+    const ImU32 inside_hover_col = ImColor(menu::colors::global_red, menu::colors::global_green, menu::colors::global_blue, it_anim->second.closing_alpha);
+
+    draw->AddRectFilled(bb.Min, ImVec2(bb.Min.x + it_anim->second.closing_anim, bb.Max.y), inside_hover_col, style.FrameRounding, ImDrawFlags_RoundCornersLeft);
+    draw->AddRectFilled(ImVec2(bb.Max.x - it_anim->second.closing_anim, bb.Min.y), bb.Max, inside_hover_col, style.FrameRounding, ImDrawFlags_RoundCornersRight);
+
+    PushStyleColor(ImGuiCol_Text, ColorConvertFloat4ToU32(ImColor(255.f, 255.f, 255.f, menu::colors::global_alpha - it_anim->second.label_alpha)));
     if (g.LogEnabled)
         LogSetNextTextDecoration("[", "]");
     RenderTextClipped(bb.Min + style.FramePadding, bb.Max - style.FramePadding, label, NULL, &label_size, style.ButtonTextAlign, &bb);
+    PopStyleColor();
 
-    // Automatically close popups
-    //if (pressed && !(flags & ImGuiButtonFlags_DontClosePopups) && (window->Flags & ImGuiWindowFlags_Popup))
-    //    CloseCurrentPopup();
+    ImVec4* c = GetStyle().Colors;
+
+    PushStyleColor(ImGuiCol_Text, ColorConvertFloat4ToU32(ImColor(27, 27, 27, static_cast<int>(it_anim->second.label_alpha))));
+    if (g.LogEnabled)
+        LogSetNextTextDecoration("[", "]");
+    RenderTextClipped(bb.Min + style.FramePadding, bb.Max - style.FramePadding, label, NULL, &label_size, style.ButtonTextAlign, &bb);
+    PopStyleColor();
 
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
     return pressed;

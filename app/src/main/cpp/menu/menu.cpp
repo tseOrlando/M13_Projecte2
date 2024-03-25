@@ -3,6 +3,7 @@
 //
 
 #include "../menu/headers/menu.h"
+#include "headers/memory_images/hard_motion_logo.h"
 
 /*
  * Here the menu is being built with the ImGui API and it's being already called
@@ -25,7 +26,19 @@ void menu::spawn() noexcept
 
     widgets::logo();
 
-    //...
+    widgets::window_with_margins("###options_main", 450.f, ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
+
+    if (center_(widgets::body_button("login"), 0.f, 50.f, 50.f))
+    {
+
+    }
+
+    if (center_(widgets::body_button("register"), 0.f, 50.f, 50.f))
+    {
+
+    }
+
+    ImGui::EndChild();
 
     ImGui::End();
 
@@ -60,7 +73,7 @@ void menu::load_style() noexcept
     menu::font::head = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size + 100.f);
     io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 15.f, &icons_config, icons_ranges);
 
-    menu::font::body = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size);
+    menu::font::body = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size + 20.f);
     io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 35.f, &icons_config, icons_ranges);
 }
 
@@ -69,6 +82,13 @@ void menu::load_style() noexcept
  */
 void menu::widgets::head_text(const std::string& text) noexcept { wtools::resize_text(font::head, text); }
 void menu::widgets::body_text(const std::string& text) noexcept { wtools::resize_text(font::body, text); }
+
+/*
+ * Buttons wrapped in their different fonts in order to use them without the problem
+ * of pushing and popping the same fonts in a redundant form
+ */
+bool menu::widgets::head_button(const std::string &text) noexcept { return wtools::resize_button(font::head, text); }
+bool menu::widgets::body_button(const std::string &text) noexcept { return wtools::resize_button(font::body, text); }
 
 /*
  * This represents the big title on every tab seen in Hard Motion.
@@ -80,35 +100,38 @@ void menu::widgets::body_text(const std::string& text) noexcept { wtools::resize
  */
 void menu::widgets::upper_title(const std::string &text) noexcept
 {
-    float extra_size = 30.f;
+    float extra_size = 60.f;
 
     ImVec2 text_size = ImGui::CalcTextSize(text.c_str());
-    ImVec2 child_window_size(text_size.x + extra_size * 2, text_size.y + extra_size);
+    ImVec2 child_window_size(text_size.x + extra_size, text_size.y + extra_size / 4);
 
-    wtools::center(child_window_size.x, 125);
+    wtools::center(child_window_size.x, 200);
     ImGui::BeginChild("###", child_window_size);
 
-    ImGui::SetCursorPosX(extra_size);
-    head_text(text);
+    center_(head_text(text));
 
     ImGui::EndChild();
 }
 
 /*
- * Displays the logo of Hard Motion centered
+ * Loads the Hard Motion logo
  */
 void menu::widgets::logo() noexcept
 {
-    int width = 0, height = 0;
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, hard_motion_logo);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    ImGui::Image(reinterpret_cast<ImTextureID>(textureID), ImVec2(width, height));
-
-
+    ImVec2 image_size(700.f, 700.f); //soon custom in order to add it wherever you want
+    center_(wtools::load_image(hard_motion_logo, sizeof hard_motion_logo, image_size), 250.f, 250.f);
 }
+/*
+ * This function adds margins to the BeginChild's, It doesn't have 'ImGui::EndChild'!!!, after
+ * calling this you're responsible of adding the correspondent EndChild to never get problems
+ * and get nice margins B)
+ */
+bool menu::widgets::window_with_margins(const std::string &label, float vertical_length, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) noexcept
+{
+    float margin = 50.f;
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + margin);
+
+    return ImGui::BeginChild(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x - margin, vertical_length), child_flags, window_flags);
+}
+
 

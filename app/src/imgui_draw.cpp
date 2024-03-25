@@ -179,7 +179,7 @@ void ImGui::StyleColorsDark(ImGuiStyle* dst)
     ImGuiStyle* style  = dst ? dst : &ImGui::GetStyle();
     ImVec4*     colors = style->Colors;
 
-    colors[ImGuiCol_Text]                   = menu::colors::font;
+    colors[ImGuiCol_Text]                   = ImVec4::FromRGBA(menu::colors::global_red, menu::colors::global_green, menu::colors::global_blue, menu::colors::global_alpha);
     colors[ImGuiCol_TextDisabled]           = menu::colors::hint;
     colors[ImGuiCol_WindowBg]               = menu::colors::parent;
     colors[ImGuiCol_ChildBg]                = menu::colors::child;

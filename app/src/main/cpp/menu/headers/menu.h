@@ -7,7 +7,6 @@
 #include "fonts/manrope.h"
 #include "icons/icon_data.h"
 #include "icons/icons.h"
-#include "hard_motion_logo/hard_motion_logo.h"
 
 #ifndef HARD_MOTION_MENU_H
 #define HARD_MOTION_MENU_H
@@ -26,6 +25,9 @@ namespace menu
     namespace colors
     {
         inline float global_alpha = 255.f;
+        inline float global_red   = 255.f;
+        inline float global_green = 255.f;
+        inline float global_blue  = 255.f;
 
         inline ImVec4 parent    = ImVec4::FromRGBA(32,  32,  32,  global_alpha); // #202020
         inline ImVec4 child     = ImVec4::FromRGBA(39,  39,  39,  global_alpha); // #272727
@@ -54,9 +56,14 @@ namespace menu
         void head_text(const std::string& text)   noexcept;
         void body_text(const std::string& text)   noexcept;
 
+        bool head_button(const std::string& text) noexcept;
+        bool body_button(const std::string& text) noexcept;
+
         void upper_title(const std::string& text) noexcept;
 
         void logo()                               noexcept;
+
+        bool window_with_margins(const std::string &label, float vertical_length = 450.f, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
     }
 }
 

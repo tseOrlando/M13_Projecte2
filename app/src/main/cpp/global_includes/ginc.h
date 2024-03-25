@@ -20,6 +20,7 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+#include <map>
 
 #include "imgui.h"
 #include "imgui_impl_android.h"
