@@ -23,6 +23,10 @@ void menu::spawn() noexcept
 
     widgets::upper_title("hard motion");
 
+    widgets::logo();
+
+    //...
+
     ImGui::End();
 
     ImGui::PopStyleVar();
@@ -81,12 +85,30 @@ void menu::widgets::upper_title(const std::string &text) noexcept
     ImVec2 text_size = ImGui::CalcTextSize(text.c_str());
     ImVec2 child_window_size(text_size.x + extra_size * 2, text_size.y + extra_size);
 
-    ImGui::SetCursorPos(ImVec2((ImGui::GetWindowSize().x - child_window_size.x) * 0.5f, 125));
+    wtools::center(child_window_size.x, 125);
     ImGui::BeginChild("###", child_window_size);
 
     ImGui::SetCursorPosX(extra_size);
     head_text(text);
 
     ImGui::EndChild();
+}
+
+/*
+ * Displays the logo of Hard Motion centered
+ */
+void menu::widgets::logo() noexcept
+{
+    int width = 0, height = 0;
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, hard_motion_logo);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    ImGui::Image(reinterpret_cast<ImTextureID>(textureID), ImVec2(width, height));
+
+
 }
 

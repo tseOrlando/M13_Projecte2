@@ -13,11 +13,11 @@
  *
  * The functions are declared on 'wtools.cpp'
  */
+
 namespace wtools
 {
-    void resize_text(ImFont* font, const std::string& text) noexcept;
-    void center()                                           noexcept;
-
+    void resize_text(ImFont* font, const std::string& text)       noexcept;
+    void center(float x, float y)                                 noexcept;
 }
 
 #endif //HARD_MOTION_WTOOLS_H

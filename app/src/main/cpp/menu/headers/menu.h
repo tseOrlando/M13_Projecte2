@@ -7,6 +7,7 @@
 #include "fonts/manrope.h"
 #include "icons/icon_data.h"
 #include "icons/icons.h"
+#include "hard_motion_logo/hard_motion_logo.h"
 
 #ifndef HARD_MOTION_MENU_H
 #define HARD_MOTION_MENU_H
@@ -50,10 +51,12 @@ namespace menu
 
     namespace widgets
     {
-        void head_text(const std::string& text)  noexcept;
-        void body_text(const std::string& text)  noexcept;
+        void head_text(const std::string& text)   noexcept;
+        void body_text(const std::string& text)   noexcept;
 
         void upper_title(const std::string& text) noexcept;
+
+        void logo()                               noexcept;
     }
 }
 

@@ -17,5 +17,10 @@ void wtools::resize_text(ImFont* font, const std::string& text) noexcept
 
 /*
  * Centers whatever is called ( as long as is a ImGui widget ) below of the call of 'center'
+ * The y parameter makes it available to align to a certain y-axis offset
+ * The x parameter depends on the widget size meaning you still have to calculate the total
+ * x value in order to the item be correctly aligned
  */
-void wtools::center() noexcept { ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2) * 0.5f); }
+void wtools::center(float x, float y) noexcept { ImGui::SetCursorPos(ImVec2((ImGui::GetWindowSize().x - x) * 0.5f, y)); }
+
+
