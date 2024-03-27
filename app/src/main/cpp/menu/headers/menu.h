@@ -71,7 +71,7 @@ namespace menu
 
     namespace scales
     {
-        inline float option = 207.5f;
+        inline float option = 225.f;
 
         inline float margin = 50.f;
     }

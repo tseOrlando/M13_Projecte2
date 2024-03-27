@@ -715,7 +715,6 @@ bool ImGui::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags
     const ImVec2 label_size = CalcTextSize(label, NULL, true);
     ImDrawList* draw = GetWindowDrawList();
 
-
     static std::map<ImGuiID, button_animation> anim;
     auto it_anim = anim.find(id);
 
@@ -730,7 +729,7 @@ bool ImGui::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags
     if ((flags & ImGuiButtonFlags_AlignTextBaseLine) && style.FramePadding.y < window->DC.CurrLineTextBaseOffset)
         pos.y += window->DC.CurrLineTextBaseOffset - style.FramePadding.y;
 
-    ImVec2 size = CalcItemSize(size_arg, label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 2.0f);
+    ImVec2 size = CalcItemSize(size_arg, label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 11.5f);
 
     const ImRect bb(pos, pos + size);
 
@@ -759,6 +758,8 @@ bool ImGui::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags
     }
 
     const ImU32 inside_hover_col = ImColor(menu::colors::global_red, menu::colors::global_green, menu::colors::global_blue, it_anim->second.closing_alpha);
+
+    draw->AddRectFilled(bb.Min, bb.Max, ImColor(48, 48, 48, static_cast<int>(menu::colors::global_alpha)), style.FrameRounding);
 
     draw->AddRectFilled(bb.Min, ImVec2(bb.Min.x + it_anim->second.closing_anim, bb.Max.y), inside_hover_col, style.FrameRounding, ImDrawFlags_RoundCornersLeft);
     draw->AddRectFilled(ImVec2(bb.Max.x - it_anim->second.closing_anim, bb.Min.y), bb.Max, inside_hover_col, style.FrameRounding, ImDrawFlags_RoundCornersRight);

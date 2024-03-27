@@ -48,7 +48,7 @@ bool wtools::button(ImFont *font, const std::string &text, bool centered) noexce
 
     ImGui::PopFont();
 
-    ImGui::Dummy(ImVec2(0, margin));
+    ImGui::Dummy(ImVec2(0, margin / 4));
 
     return used;
 }
