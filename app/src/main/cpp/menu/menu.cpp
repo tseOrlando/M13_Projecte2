@@ -22,23 +22,7 @@ void menu::spawn() noexcept
 
     ImGui::Begin("Hard Motion", nullptr, flags);
 
-    widgets::upper_title("hard motion");
-
-    widgets::logo();
-
-    widgets::window_with_margins("###options", scales::option * 2, ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
-
-    if (widgets::body_button("login"))
-    {
-
-    }
-
-    if (widgets::body_button("register"))
-    {
-
-    }
-
-    ImGui::EndChild();
+    core::update_tab(14);
 
     ImGui::End();
 
@@ -132,6 +116,135 @@ bool menu::widgets::window_with_margins(const std::string &label, float vertical
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + scales::margin);
 
     return ImGui::BeginChild(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x - scales::margin, vertical_length), child_flags, window_flags);
+}
+
+/*
+ * This function will update the tabs internally and visually at the same time.
+ *
+ * ImGui doesn't have a tab system so I may make it somehow from ground up..
+ * By tab system I refer to a View system like Android Studio Interface System has
+ *
+ * Overall it seems good
+ */
+void menu::core::update_tab(int tab)
+{
+    switch (tab)
+    {
+        case 0:  lobby::landing();                               break;
+
+        case 1:  lobby::auth::log_in();                          break;
+        case 2:  lobby::auth::register_in();                     break;
+
+        case 3:  lobby::main::hub();                             break;
+
+        case 4:  lobby::main::events::events();                  break;
+        case 5:  lobby::main::events::event_info();              break;
+        case 6:  lobby::main::events::members::event_members();  break;
+        case 7:  lobby::main::events::members::member_info();    break;
+        case 8:  lobby::main::events::create_event();            break;
+        case 9:  lobby::main::events::joined_events();           break;
+
+        case 10: lobby::main::search::search();                  break;
+        case 11: lobby::main::search::filter();                  break;
+
+        case 12: lobby::main::user::user();                      break;
+        case 13: lobby::main::user::edit_user_info();            break;
+        case 14: lobby::main::user::admin_panel();               break;
+    }
+}
+
+/*
+ * Where you land first, the home page
+ */
+void menu::core::lobby::landing() noexcept
+{
+    widgets::upper_title("hard motion");
+
+    widgets::logo();
+
+    widgets::window_with_margins("###options", scales::option * 2, ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
+
+    if (widgets::body_button("login"))
+    {
+
+    }
+
+    if (widgets::body_button("register"))
+    {
+
+    }
+
+    ImGui::EndChild();
+}
+
+void menu::core::lobby::auth::log_in() noexcept
+{
+    widgets::upper_title("user login");
+}
+
+void menu::core::lobby::auth::register_in() noexcept
+{
+    widgets::upper_title("user register");
+}
+
+void menu::core::lobby::main::hub() noexcept
+{
+    widgets::upper_title("hard motion");
+}
+
+void menu::core::lobby::main::events::events() noexcept
+{
+    widgets::upper_title("events");
+}
+
+void menu::core::lobby::main::events::event_info() noexcept
+{
+    widgets::upper_title("event info");
+}
+
+void menu::core::lobby::main::events::members::event_members() noexcept
+{
+    widgets::upper_title("members");
+}
+
+void menu::core::lobby::main::events::members::member_info() noexcept
+{
+    widgets::upper_title("member info");
+}
+
+void menu::core::lobby::main::events::create_event() noexcept
+{
+    widgets::upper_title("create event");
+}
+
+void menu::core::lobby::main::events::joined_events() noexcept
+{
+    widgets::upper_title("joined events");
+}
+
+void menu::core::lobby::main::search::search() noexcept
+{
+    widgets::upper_title("search");
+}
+
+void menu::core::lobby::main::search::filter() noexcept
+{
+    widgets::upper_title("filter");
+}
+
+void menu::core::lobby::main::user::user() noexcept
+{
+    widgets::upper_title("user");
+}
+
+void menu::core::lobby::main::user::edit_user_info() noexcept
+{
+    widgets::upper_title("edit");
+}
+
+void menu::core::lobby::main::user::admin_panel() noexcept
+{
+    widgets::upper_title("admin panel");
 }
 
 

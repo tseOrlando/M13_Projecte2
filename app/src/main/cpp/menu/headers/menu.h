@@ -75,6 +75,57 @@ namespace menu
 
         inline float margin = 50.f;
     }
+
+    namespace core
+    {
+        void update_tab(int tab);
+
+        inline std::map<int, bool> tabs;
+
+        namespace lobby
+        {
+            void landing() noexcept;
+
+            namespace auth
+            {
+                void log_in() noexcept;
+                void register_in() noexcept;
+            }
+
+            namespace main
+            {
+                void hub() noexcept;
+
+                namespace events
+                {
+                    void events() noexcept;
+                    void event_info() noexcept;
+
+                    namespace members
+                    {
+                        void event_members() noexcept;
+                        void member_info() noexcept;
+                    }
+
+                    void create_event() noexcept;
+                    void joined_events() noexcept;
+                }
+
+                namespace search
+                {
+                    void search() noexcept;
+                    void filter() noexcept;
+                }
+
+                namespace user
+                {
+                    void user() noexcept;
+                    void edit_user_info() noexcept;
+                    void admin_panel() noexcept;
+                }
+            }
+        }
+    }
 }
 
 #endif //HARD_MOTION_MENU_H
