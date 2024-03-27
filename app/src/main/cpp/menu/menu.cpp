@@ -26,14 +26,14 @@ void menu::spawn() noexcept
 
     widgets::logo();
 
-    widgets::window_with_margins("###options_main", 450.f, ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    widgets::window_with_margins("###options", scales::option * 2, ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
 
-    if (center_(widgets::body_button("login"), 0.f, 50.f, 50.f))
+    if (widgets::body_button("login"))
     {
 
     }
 
-    if (center_(widgets::body_button("register"), 0.f, 50.f, 50.f))
+    if (widgets::body_button("register"))
     {
 
     }
@@ -80,15 +80,15 @@ void menu::load_style() noexcept
 /*
  * Memory based head and body fonts wrapped in 1 function in order to operate fast
  */
-void menu::widgets::head_text(const std::string& text) noexcept { wtools::resize_text(font::head, text); }
-void menu::widgets::body_text(const std::string& text) noexcept { wtools::resize_text(font::body, text); }
+void menu::widgets::head_text(const std::string& text, bool centered) noexcept { wtools::text(font::head, text, centered); }
+void menu::widgets::body_text(const std::string& text, bool centered) noexcept { wtools::text(font::body, text, centered); }
 
 /*
  * Buttons wrapped in their different fonts in order to use them without the problem
  * of pushing and popping the same fonts in a redundant form
  */
-bool menu::widgets::head_button(const std::string &text) noexcept { return wtools::resize_button(font::head, text); }
-bool menu::widgets::body_button(const std::string &text) noexcept { return wtools::resize_button(font::body, text); }
+bool menu::widgets::head_button(const std::string &text, bool centered) noexcept { return wtools::button(font::head, text, centered); }
+bool menu::widgets::body_button(const std::string &text, bool centered) noexcept { return wtools::button(font::body, text, centered); }
 
 /*
  * This represents the big title on every tab seen in Hard Motion.
@@ -100,15 +100,11 @@ bool menu::widgets::body_button(const std::string &text) noexcept { return wtool
  */
 void menu::widgets::upper_title(const std::string &text) noexcept
 {
-    float extra_size = 60.f;
+    ImGui::Dummy(ImVec2(0.f, 200.f)); // if logged in, less ( maybe / 2 ?? ) so it can fit the profile square
 
-    ImVec2 text_size = ImGui::CalcTextSize(text.c_str());
-    ImVec2 child_window_size(text_size.x + extra_size, text_size.y + extra_size / 4);
+    window_with_margins("###", ImGui::CalcTextSize(text.c_str()).y + 10.f);
 
-    wtools::center(child_window_size.x, 200);
-    ImGui::BeginChild("###", child_window_size);
-
-    center_(head_text(text));
+    head_text(text);
 
     ImGui::EndChild();
 }
@@ -119,7 +115,12 @@ void menu::widgets::upper_title(const std::string &text) noexcept
 void menu::widgets::logo() noexcept
 {
     ImVec2 image_size(700.f, 700.f); //soon custom in order to add it wherever you want
-    center_(wtools::load_image(hard_motion_logo, sizeof hard_motion_logo, image_size), 250.f, 250.f);
+
+    ImGui::Dummy(ImVec2(0.f, 200.f));
+
+    wtools::image(hard_motion_logo, sizeof hard_motion_logo, image_size, true);
+
+    ImGui::Dummy(ImVec2(0.f, 200.f));
 }
 /*
  * This function adds margins to the BeginChild's, It doesn't have 'ImGui::EndChild'!!!, after
@@ -128,10 +129,9 @@ void menu::widgets::logo() noexcept
  */
 bool menu::widgets::window_with_margins(const std::string &label, float vertical_length, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) noexcept
 {
-    float margin = 50.f;
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + margin);
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + scales::margin);
 
-    return ImGui::BeginChild(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x - margin, vertical_length), child_flags, window_flags);
+    return ImGui::BeginChild(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x - scales::margin, vertical_length), child_flags, window_flags);
 }
 
 

@@ -763,17 +763,11 @@ bool ImGui::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags
     draw->AddRectFilled(bb.Min, ImVec2(bb.Min.x + it_anim->second.closing_anim, bb.Max.y), inside_hover_col, style.FrameRounding, ImDrawFlags_RoundCornersLeft);
     draw->AddRectFilled(ImVec2(bb.Max.x - it_anim->second.closing_anim, bb.Min.y), bb.Max, inside_hover_col, style.FrameRounding, ImDrawFlags_RoundCornersRight);
 
-    PushStyleColor(ImGuiCol_Text, ColorConvertFloat4ToU32(ImColor(255.f, 255.f, 255.f, menu::colors::global_alpha - it_anim->second.label_alpha)));
-    if (g.LogEnabled)
-        LogSetNextTextDecoration("[", "]");
+    PushStyleColor(ImGuiCol_Text, ColorConvertFloat4ToU32(ImColor(menu::colors::global_red, menu::colors::global_green, menu::colors::global_blue, menu::colors::global_alpha - it_anim->second.label_alpha)));
     RenderTextClipped(bb.Min + style.FramePadding, bb.Max - style.FramePadding, label, NULL, &label_size, style.ButtonTextAlign, &bb);
     PopStyleColor();
 
-    ImVec4* c = GetStyle().Colors;
-
-    PushStyleColor(ImGuiCol_Text, ColorConvertFloat4ToU32(ImColor(27, 27, 27, static_cast<int>(it_anim->second.label_alpha))));
-    if (g.LogEnabled)
-        LogSetNextTextDecoration("[", "]");
+    PushStyleColor(ImGuiCol_Text, ColorConvertFloat4ToU32(ImColor(48, 48, 48, static_cast<int>(it_anim->second.label_alpha))));
     RenderTextClipped(bb.Min + style.FramePadding, bb.Max - style.FramePadding, label, NULL, &label_size, style.ButtonTextAlign, &bb);
     PopStyleColor();
 
@@ -1154,6 +1148,14 @@ bool ImGui::ImageButton(ImTextureID user_texture_id, const ImVec2& size, const I
 }
 #endif // #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
+struct checkbox_anim
+{
+    float checkbox_move_motion;
+    float alpha_from_arrow;
+    float alpha_from_lett;
+    float hover_embiggened;
+};
+
 bool ImGui::Checkbox(const char* label, bool* v)
 {
     ImGuiWindow* window = GetCurrentWindow();
@@ -1183,29 +1185,48 @@ bool ImGui::Checkbox(const char* label, bool* v)
         MarkItemEdited(id);
     }
 
-    const ImRect check_bb(pos, pos + ImVec2(square_sz, square_sz));
-    RenderNavHighlight(total_bb, id);
-    RenderFrame(check_bb.Min, check_bb.Max, GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg), true, style.FrameRounding);
-    ImU32 check_col = GetColorU32(ImGuiCol_CheckMark);
-    bool mixed_value = (g.LastItemData.InFlags & ImGuiItemFlags_MixedValue) != 0;
-    if (mixed_value)
+    static std::map <ImGuiID, checkbox_anim> anim;
+    auto it_anim = anim.find(id);
+
+    if (it_anim == anim.end())
     {
-        // Undocumented tristate/mixed/indeterminate checkbox (#2644)
-        // This may seem awkwardly designed because the aim is to make ImGuiItemFlags_MixedValue supported by all widgets (not just checkbox)
-        ImVec2 pad(ImMax(1.0f, IM_TRUNC(square_sz / 3.6f)), ImMax(1.0f, IM_TRUNC(square_sz / 3.6f)));
-        window->DrawList->AddRectFilled(check_bb.Min + pad, check_bb.Max - pad, check_col, style.FrameRounding);
-    }
-    else if (*v)
-    {
-        const float pad = ImMax(1.0f, IM_TRUNC(square_sz / 6.0f));
-        RenderCheckMark(window->DrawList, check_bb.Min + ImVec2(pad, pad), check_col, square_sz - pad * 2.0f);
+        anim.insert({ id, {0} });
+        it_anim = anim.find(id);
     }
 
+    const ImRect check_bb(pos, pos + ImVec2(square_sz, square_sz));
+    RenderNavHighlight(total_bb, id);
+    ImU32 check_col = GetColorU32(ImGuiCol_CheckMark);
+    bool mixed_value = (g.LastItemData.InFlags & ImGuiItemFlags_MixedValue) != 0;
+
+    const float padding = ImMax(1.0f, IM_FLOOR(square_sz / 6.0f));
+
+    if (*v)
+    {
+        it_anim->second.checkbox_move_motion = ImLerp(it_anim->second.checkbox_move_motion, 5.f, 0.1f);
+        it_anim->second.alpha_from_arrow = ImLerp(it_anim->second.alpha_from_arrow, 255.f, 0.1f);
+        it_anim->second.alpha_from_lett = ImLerp(it_anim->second.alpha_from_lett, 255.f, 0.1f);
+    }
+    else
+    {
+        it_anim->second.checkbox_move_motion = ImLerp(it_anim->second.checkbox_move_motion, 0.f, 0.1f);
+        it_anim->second.alpha_from_arrow = ImLerp(it_anim->second.alpha_from_arrow, menu::colors::off_alpha, 0.1f);
+        it_anim->second.alpha_from_lett = ImLerp(it_anim->second.alpha_from_lett, 175.f, 0.1f);
+    }
+
+    RenderCheckMark(window->DrawList, check_bb.Min + ImVec2(it_anim->second.checkbox_move_motion + 3, padding), ImColor(menu::colors::global_red, menu::colors::global_green, menu::colors::global_blue, menu::colors::global_alpha), 5 + it_anim->second.hover_embiggened);
+
+    if (IsItemHovered()) it_anim->second.hover_embiggened = ImLerp(it_anim->second.hover_embiggened, 3.50f, 0.1f);
+    else it_anim->second.hover_embiggened = ImLerp(it_anim->second.hover_embiggened, 0.40f, 0.1f);
+
     ImVec2 label_pos = ImVec2(check_bb.Max.x + style.ItemInnerSpacing.x, check_bb.Min.y + style.FramePadding.y);
-    if (g.LogEnabled)
-        LogRenderedText(&label_pos, mixed_value ? "[~]" : *v ? "[x]" : "[ ]");
     if (label_size.x > 0.0f)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, menu::colors::off_alpha));
         RenderText(label_pos, label);
+        ImGui::PopStyleColor();
+    }
+
 
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags | ImGuiItemStatusFlags_Checkable | (*v ? ImGuiItemStatusFlags_Checked : 0));
     return pressed;

@@ -25,6 +25,9 @@ namespace menu
     namespace colors
     {
         inline float global_alpha = 255.f;
+        inline float off_alpha    = 90.f;
+
+
         inline float global_red   = 255.f;
         inline float global_green = 255.f;
         inline float global_blue  = 255.f;
@@ -41,7 +44,7 @@ namespace menu
     namespace size
     {
         inline float scale  = 140.f;
-        inline int   round  = 32;
+        inline int   round  = 50;
         inline int   border = 0;
     }
 
@@ -53,17 +56,24 @@ namespace menu
 
     namespace widgets
     {
-        void head_text(const std::string& text)   noexcept;
-        void body_text(const std::string& text)   noexcept;
+        void head_text(const std::string& text, bool centered = true)                                                                                       noexcept;
+        void body_text(const std::string& text, bool centered = true)                                                                                       noexcept;
 
-        bool head_button(const std::string& text) noexcept;
-        bool body_button(const std::string& text) noexcept;
+        bool head_button(const std::string& text, bool centered = true)                                                                                     noexcept;
+        bool body_button(const std::string& text, bool centered = true)                                                                                     noexcept;
 
-        void upper_title(const std::string& text) noexcept;
+        void upper_title(const std::string& text)                                                                                                           noexcept;
 
-        void logo()                               noexcept;
+        void logo()                                                                                                                                         noexcept;
 
-        bool window_with_margins(const std::string &label, float vertical_length = 450.f, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
+        bool window_with_margins(const std::string &label, float vertical_length = 0.f, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
+    }
+
+    namespace scales
+    {
+        inline float option = 207.5f;
+
+        inline float margin = 50.f;
     }
 }
 

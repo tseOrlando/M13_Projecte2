@@ -13,15 +13,11 @@
  *
  * The functions are declared on 'wtools.cpp'
  */
-
 namespace wtools
 {
-    void resize_text(ImFont* font, const std::string& text)                   noexcept;
-    bool resize_button(ImFont* font, const std::string& text)                 noexcept;
-
-    void center(float x, float y)                                             noexcept;
-
-    void load_image(const unsigned char* data, size_t data_size, ImVec2 size) noexcept;
+    void text(ImFont* font, const std::string& text, bool centered)                     noexcept;
+    bool button(ImFont* font, const std::string& text, bool centered)                   noexcept;
+    void image(const unsigned char* data, size_t data_size, ImVec2 size, bool centered) noexcept;
 }
 
 /*
