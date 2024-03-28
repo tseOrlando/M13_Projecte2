@@ -126,7 +126,7 @@ bool menu::widgets::window_with_margins(const std::string &label, float vertical
  *
  * Overall it seems good
  */
-void menu::core::go_to_tab(tab_t tab)
+void menu::core::go_to_tab(tab_t tab) noexcept
 {
     if (tab < _landing or tab > _user)
         return;
@@ -153,6 +153,7 @@ void menu::core::go_to_tab(tab_t tab)
         case _user: lobby::main::user::user();                               break;
         case _edit_user_info: lobby::main::user::edit_user_info();           break;
         case _admin_panel: lobby::main::user::admin_panel();                 break;
+        default:                                                             break;
     }
 }
 
@@ -161,7 +162,7 @@ void menu::core::go_to_tab(tab_t tab)
  * the back button. I call this on the JNICALL of 'native-lib.cpp', on
  * the callback 'onKeyPressed' of 'MainActivity'
  */
-void menu::core::go_back()
+void menu::core::go_back() noexcept
 {
     switch(current_tab)
     {

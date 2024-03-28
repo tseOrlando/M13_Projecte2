@@ -78,22 +78,22 @@ namespace menu
             _landing        = 0,
             _log_in         = 1,
             _register_in    = 2,
-            _hub            = 50,
-            _events         = 100,
-            _event_info     = 4,
-            _event_members  = 150,
-            _member_info    = 5,
-            _create_event   = 6,
-            _joined_events  = 7,
-            _search         = 200,
+            _hub            = 3,
+            _events         = 4,
+            _event_info     = 5,
+            _event_members  = 6,
+            _member_info    = 7,
+            _create_event   = 8,
+            _joined_events  = 9,
+            _search         = 10,
             _filter         = 11,
-            _user           = 250,
+            _user           = 12,
             _edit_user_info = 13,
             _admin_panel    = 14
         };
 
-        void go_to_tab(tab_t tab);
-        void go_back();
+        void go_to_tab(tab_t tab) noexcept;
+        void go_back()            noexcept;
 
         inline tab_t current_tab = tab_t::_landing;
 

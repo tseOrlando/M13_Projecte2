@@ -97,6 +97,6 @@ private:
  * Cons : to add only spacing you'll need to still add a y_offset, you can do it with 0.f on the
  * second one, to avoid redundancy I made it like that
  */
-#define center_(control, ...) centered_control_t{ImGui::GetWindowSize(), __VA_ARGS__}([&]() { control; })
+//#define center_(control, ...) centered_control_t{ImGui::GetWindowSize(), __VA_ARGS__}([&]() { control; })
 
 #endif //HARD_MOTION_WTOOLS_H
