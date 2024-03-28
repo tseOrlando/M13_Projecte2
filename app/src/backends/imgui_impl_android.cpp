@@ -32,6 +32,7 @@
 #include "imgui.h"
 #ifndef IMGUI_DISABLE
 #include "imgui_impl_android.h"
+#include "main/cpp/menu/headers/menu.h"
 #include <time.h>
 #include <android/native_window.h>
 #include <android/input.h>
@@ -183,6 +184,7 @@ int32_t ImGui_ImplAndroid_HandleInputEvent(const AInputEvent* input_event)
         case AKEY_EVENT_ACTION_UP:
         {
             ImGuiKey key = ImGui_ImplAndroid_KeyCodeToImGuiKey(event_key_code);
+
             if (key != ImGuiKey_None)
             {
                 io.AddKeyEvent(key, event_action == AKEY_EVENT_ACTION_DOWN);

@@ -41,13 +41,6 @@ namespace menu
         inline ImVec4 admin     = ImVec4::FromRGBA(255, 101, 101, global_alpha); // #FF6565
     }
 
-    namespace size
-    {
-        inline float scale  = 140.f;
-        inline int   round  = 50;
-        inline int   border = 0;
-    }
-
     namespace font
     {
         inline ImFont* head = nullptr;
@@ -71,57 +64,81 @@ namespace menu
 
     namespace scales
     {
-        inline float option = 225.f;
-
+        inline float option = 218.f;
+        inline float scale  = 140.f;
+        inline int   round  = 50;
+        inline int   border = 0;
         inline float margin = 50.f;
     }
 
     namespace core
     {
-        void update_tab(int tab);
+        enum tab_t : int
+        {
+            _landing        = 0,
+            _log_in         = 1,
+            _register_in    = 2,
+            _hub            = 50,
+            _events         = 100,
+            _event_info     = 4,
+            _event_members  = 150,
+            _member_info    = 5,
+            _create_event   = 6,
+            _joined_events  = 7,
+            _search         = 200,
+            _filter         = 11,
+            _user           = 250,
+            _edit_user_info = 13,
+            _admin_panel    = 14
+        };
+
+        void go_to_tab(tab_t tab);
+        void go_back();
+
+        inline tab_t current_tab = tab_t::_landing;
 
         inline std::map<int, bool> tabs;
 
         namespace lobby
         {
-            void landing() noexcept;
+            void                   landing() noexcept;
 
             namespace auth
             {
-                void log_in() noexcept;
-                void register_in() noexcept;
+                void                log_in() noexcept;
+                void           register_in() noexcept;
             }
 
             namespace main
             {
-                void hub() noexcept;
+                void                   hub() noexcept;
 
                 namespace events
                 {
-                    void events() noexcept;
-                    void event_info() noexcept;
+                    void            events() noexcept;
+                    void        event_info() noexcept;
 
                     namespace members
                     {
                         void event_members() noexcept;
-                        void member_info() noexcept;
+                        void   member_info() noexcept;
                     }
 
-                    void create_event() noexcept;
-                    void joined_events() noexcept;
+                    void      create_event() noexcept;
+                    void     joined_events() noexcept;
                 }
 
                 namespace search
                 {
-                    void search() noexcept;
-                    void filter() noexcept;
+                    void            search() noexcept;
+                    void            filter() noexcept;
                 }
 
                 namespace user
                 {
-                    void user() noexcept;
-                    void edit_user_info() noexcept;
-                    void admin_panel() noexcept;
+                    void              user() noexcept;
+                    void    edit_user_info() noexcept;
+                    void       admin_panel() noexcept;
                 }
             }
         }

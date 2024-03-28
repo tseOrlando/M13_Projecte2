@@ -277,3 +277,5 @@ static int GetAssetData(const char* filename, void** outData)
     }
     return num_bytes;
 }
+
+extern "C" JNIEXPORT void JNICALL Java_imgui_example_android_MainActivity_handleBackPressed(JNIEnv *env, jobject thiz) { menu::core::go_back(); }

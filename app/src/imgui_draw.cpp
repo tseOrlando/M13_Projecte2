@@ -233,20 +233,20 @@ void ImGui::StyleColorsDark(ImGuiStyle* dst)
     colors[ImGuiCol_NavWindowingDimBg]      = menu::colors::widgets;
     colors[ImGuiCol_ModalWindowDimBg]       = menu::colors::widgets;
 
-    style->TabRounding             = menu::size::round;
-    style->GrabRounding            = menu::size::round;
-    style->ScrollbarRounding       = menu::size::round;
-    style->WindowRounding          = menu::size::round;
-    style->ChildRounding           = menu::size::round;
-    style->PopupRounding           = menu::size::round;
-    style->FrameRounding           = menu::size::round;
+    style->TabRounding             = menu::scales::round;
+    style->GrabRounding            = menu::scales::round;
+    style->ScrollbarRounding       = menu::scales::round;
+    style->WindowRounding          = menu::scales::round;
+    style->ChildRounding           = menu::scales::round;
+    style->PopupRounding           = menu::scales::round;
+    style->FrameRounding           = menu::scales::round;
 
-    style->WindowBorderSize        = menu::size::border;
-    style->FrameBorderSize         = menu::size::border;
-    style->PopupBorderSize         = menu::size::border;
-    style->ChildBorderSize         = menu::size::border;
-    style->SeparatorTextBorderSize = menu::size::border;
-    style->TabBorderSize           = menu::size::border;
+    style->WindowBorderSize        = menu::scales::border;
+    style->FrameBorderSize         = menu::scales::border;
+    style->PopupBorderSize         = menu::scales::border;
+    style->ChildBorderSize         = menu::scales::border;
+    style->SeparatorTextBorderSize = menu::scales::border;
+    style->TabBorderSize           = menu::scales::border;
 }
 
 void ImGui::StyleColorsClassic(ImGuiStyle* dst)

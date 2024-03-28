@@ -22,7 +22,7 @@ void menu::spawn() noexcept
 
     ImGui::Begin("Hard Motion", nullptr, flags);
 
-    core::update_tab(14);
+    core::go_to_tab(core::current_tab);
 
     ImGui::End();
 
@@ -48,7 +48,7 @@ void menu::load_style() noexcept
 
     ImVec2 display_size = ImGui::GetIO().DisplaySize;
 
-    float scaled_font_size = menu::size::scale; // base
+    float scaled_font_size = menu::scales::scale; // base
 
     scaled_font_size *= (((display_size.x / display_size.y) < 1.5) ? 0.8f : 1.2f);
 
@@ -119,37 +119,93 @@ bool menu::widgets::window_with_margins(const std::string &label, float vertical
 }
 
 /*
- * This function will update the tabs internally and visually at the same time.
+ * This function will update the tabs visually.
  *
  * ImGui doesn't have a tab system so I may make it somehow from ground up..
  * By tab system I refer to a View system like Android Studio Interface System has
  *
  * Overall it seems good
  */
-void menu::core::update_tab(int tab)
+void menu::core::go_to_tab(tab_t tab)
 {
-    switch (tab)
+    if (tab < _landing or tab > _user)
+        return;
+
+    switch ((current_tab = tab))
     {
-        case 0:  lobby::landing();                               break;
+        case _landing:  lobby::landing();                                    break;
 
-        case 1:  lobby::auth::log_in();                          break;
-        case 2:  lobby::auth::register_in();                     break;
+        case _log_in:  lobby::auth::log_in();                                break;
+        case _register_in:  lobby::auth::register_in();                      break;
 
-        case 3:  lobby::main::hub();                             break;
+        case _hub:  lobby::main::hub();                                      break;
 
-        case 4:  lobby::main::events::events();                  break;
-        case 5:  lobby::main::events::event_info();              break;
-        case 6:  lobby::main::events::members::event_members();  break;
-        case 7:  lobby::main::events::members::member_info();    break;
-        case 8:  lobby::main::events::create_event();            break;
-        case 9:  lobby::main::events::joined_events();           break;
+        case _events:  lobby::main::events::events();                        break;
+        case _event_info:  lobby::main::events::event_info();                break;
+        case _event_members:  lobby::main::events::members::event_members(); break;
+        case _member_info:  lobby::main::events::members::member_info();     break;
+        case _create_event:  lobby::main::events::create_event();            break;
+        case _joined_events:  lobby::main::events::joined_events();          break;
 
-        case 10: lobby::main::search::search();                  break;
-        case 11: lobby::main::search::filter();                  break;
+        case _search: lobby::main::search::search();                         break;
+        case _filter: lobby::main::search::filter();                         break;
 
-        case 12: lobby::main::user::user();                      break;
-        case 13: lobby::main::user::edit_user_info();            break;
-        case 14: lobby::main::user::admin_panel();               break;
+        case _user: lobby::main::user::user();                               break;
+        case _edit_user_info: lobby::main::user::edit_user_info();           break;
+        case _admin_panel: lobby::main::user::admin_panel();                 break;
+    }
+}
+
+/*
+ * This function simulates what Android does as when you press
+ * the back button. I call this on the JNICALL of 'native-lib.cpp', on
+ * the callback 'onKeyPressed' of 'MainActivity'
+ */
+void menu::core::go_back()
+{
+    switch(current_tab)
+    {
+        case _landing:
+            break;
+
+        case _log_in:
+        case _register_in:
+            go_to_tab(_landing);
+            break;
+
+        case _hub:
+            //go_to_tab(_landing); when logged in and we want to log off after
+            break;
+
+        case _user:
+        case _search:
+        case _events:
+            go_to_tab(_hub);
+            break;
+
+        case _event_info:
+            go_to_tab(_events);
+            break;
+        case _event_members:
+            go_to_tab(_event_info);
+            break;
+        case _member_info:
+            go_to_tab(_event_members);
+            break;
+
+        case _create_event:
+        case _joined_events:
+            go_to_tab(_events);
+            break;
+
+        case _filter:
+            go_to_tab(_search);
+            break;
+
+        case _edit_user_info:
+        case _admin_panel:
+            go_to_tab(_user);
+            break;
     }
 }
 
@@ -162,17 +218,14 @@ void menu::core::lobby::landing() noexcept
 
     widgets::logo();
 
-    widgets::window_with_margins("###options", scales::option * 2, ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    widgets::window_with_margins("###options", scales::option * 2);
 
     if (widgets::body_button("login"))
-    {
+        core::go_to_tab(tab_t::_log_in);
 
-    }
 
     if (widgets::body_button("register"))
-    {
-
-    }
+        core::go_to_tab(tab_t::_register_in);
 
     ImGui::EndChild();
 }
@@ -246,5 +299,3 @@ void menu::core::lobby::main::user::admin_panel() noexcept
 {
     widgets::upper_title("admin panel");
 }
-
-

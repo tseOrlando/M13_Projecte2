@@ -4,13 +4,12 @@ project(ImGuiExample)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
-        ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/native-lib.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/menu/menu.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/menu/wtools.cpp
-
   ${CMAKE_CURRENT_SOURCE_DIR}/../../imgui.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/../../imgui_demo.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/../../imgui_draw.cpp
