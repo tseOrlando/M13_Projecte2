@@ -15,13 +15,14 @@
  */
 namespace wtools
 {
-    void text(ImFont* font, const std::string& text, bool centered)                                                      noexcept;
-    bool button(ImFont* font, const std::string& text, bool centered)                                                    noexcept;
-    bool input(ImFont* font, char* text, const std::string& hint, ImGuiInputTextFlags flags, bool centered)              noexcept;
-    void image(const unsigned char* data, size_t data_size, ImVec2 size, bool centered)                                  noexcept;
+    void text(ImFont* font, const std::string& text, bool centered)                                                                                     noexcept;
+    bool button(ImFont* font, const std::string& text, bool centered)                                                                                   noexcept;
+    bool input(ImFont* font, char* text, std::size_t text_size,  const std::string& hint, ImGuiInputTextFlags flags, bool centered)                     noexcept;
+    bool combo(ImFont* font, const char* label, int* current_item, const char* const items[], int items_count, bool centered, int height_in_items = -1) noexcept;
+    void image(const unsigned char* data, size_t data_size, ImVec2 size, bool centered)                                                                 noexcept;
 }
 
-/*
+/* OLD
  * This code is taken from 'https://github.com/ocornut/imgui/discussions/3862' and it's not mine.
  * Since ImGui is a bit hard to accommodate sometimes, I need a good centerer to make the UI faster
  * PD : Slight modified by me to adapt to my own context

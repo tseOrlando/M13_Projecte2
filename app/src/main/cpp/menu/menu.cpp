@@ -95,7 +95,7 @@ bool menu::widgets::body_button(const std::string &text, bool centered) noexcept
 /*
  * Input text with 'font::foot' by default because I really doubt it will be used with 'font::head' or 'font::body' lol
  */
-bool menu::widgets::input(char *text, const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept { return wtools::input(font::body, text, hint, flags, centered); }
+bool menu::widgets::input(char* text, std::size_t text_size, const std::string &hint, ImGuiInputTextFlags iflags, bool centered) noexcept { return wtools::input(font::body, text, text_size, hint, iflags, centered); }
 
 /*
  * This represents the big title on every tab seen in Hard Motion.
@@ -134,12 +134,30 @@ void menu::widgets::logo() noexcept
  * calling this you're responsible of adding the correspondent EndChild to never get problems
  * and get nice margins B)
  */
-bool menu::widgets::window_with_margins(const std::string &label, float vertical_length, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) noexcept
+bool menu::widgets::window_with_margins(const std::string &label, float vertical_length, float vertical_margin, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) noexcept
 {
+    if (vertical_margin != 0.f)
+        ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, vertical_margin));
+
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + scales::margin);
 
     return ImGui::BeginChild(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x - scales::margin, vertical_length), child_flags, window_flags);
 }
+/*
+ * Custom 'ImGui::EndChild()' to add a margin at the end!
+ */
+void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
+{
+    ImGui::EndChild();
+
+    if (vertical_margin != 0.f)
+        ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, vertical_margin));
+}
+
+/*
+ * Wrapped combo adapted to hard-motion context
+ */
+bool menu::widgets::combo(const char *label, int *current_item, const char *const *items, int items_count, int height_in_items, bool centered) noexcept { return wtools::combo(font::body, label, current_item, items, items_count, centered, height_in_items); }
 
 /*
  * This function will update the tabs visually.
@@ -250,22 +268,28 @@ void menu::core::lobby::landing() noexcept
     if (widgets::body_button("register"))
         core::go_to_tab(tab_t::_register_in);
 
-    ImGui::EndChild();
+    widgets::end_window_with_margins();
 }
 
+/*
+ * This and register are same stuff, but i will keep the redundancy in this 2 ones in order to be maintainable
+ */
 void menu::core::lobby::auth::log_in() noexcept
 {
     widgets::upper_title("user login");
 
-    widgets::window_with_margins("###log_in_panel", scales::input * 2);
+    widgets::window_with_margins("###log_in_panel", scales::input * 2, scales::margin * 10);
 
+    /*
+     * diff cuz of the data
+     */
     static char user_name[16] = {};
-    static char pass_word[32] = {};
+    static char pass_word[16] = {};
 
-    widgets::input(user_name, "username..");
-    widgets::input(pass_word, "password..", ImGuiInputTextFlags_Password);
+    widgets::input(user_name, sizeof user_name, "username..");
+    widgets::input(pass_word, sizeof pass_word, "password..", ImGuiInputTextFlags_Password);
 
-    ImGui::EndChild();
+    widgets::end_window_with_margins(scales::margin * 9);
 
     widgets::window_with_margins("###options", scales::option);
 
@@ -275,12 +299,47 @@ void menu::core::lobby::auth::log_in() noexcept
         core::go_to_tab(tab_t::_hub);
     }
 
-    ImGui::EndChild();
+    widgets::end_window_with_margins();
 }
 
+/*
+ * This and login are same stuff, but i will keep the redundancy in this 2 ones in order to be maintainable
+ */
 void menu::core::lobby::auth::register_in() noexcept
 {
     widgets::upper_title("user register");
+
+    widgets::window_with_margins("###register_in_panel", scales::input * 5, scales::margin * 7);
+
+    /*
+     * diff cuz of the data
+     */
+    static char user_name[16] = {};
+    static char pass_word[16] = {};
+    static char e_mail[32]    = {};
+    static char number[9]     = {};
+
+    widgets::input(user_name, sizeof user_name, "username..");
+    widgets::input(pass_word, sizeof pass_word, "password..", ImGuiInputTextFlags_Password);
+    widgets::input(e_mail, sizeof e_mail, "e-mail..");
+    widgets::input(number, sizeof number, "number..");
+
+    static const char* dances[] = { "jumpstyle", "gabber/hakken", "hard-tek" };
+    static int current_item     = 0;
+
+    widgets::combo("##dances", &current_item, dances, IM_ARRAYSIZE(dances));
+
+    widgets::end_window_with_margins(scales::margin * 7);
+
+    widgets::window_with_margins("###options", scales::option);
+
+    if (widgets::body_button("register"))
+    {
+        //-.-
+        core::go_to_tab(tab_t::_hub);
+    }
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::hub() noexcept

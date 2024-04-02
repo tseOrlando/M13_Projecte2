@@ -147,6 +147,15 @@ void MainLaunch()
     if (g_EglDisplay == EGL_NO_DISPLAY)
         return;
 
+    PollUnicodeChars();
+
+    static bool WantTextInputLast = false;
+
+    if (io.WantTextInput && !WantTextInputLast)
+        ShowSoftKeyboardInput();
+
+    WantTextInputLast = io.WantTextInput;
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplAndroid_NewFrame();
     ImGui::NewFrame();

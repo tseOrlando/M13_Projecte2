@@ -50,18 +50,20 @@ namespace menu
 
     namespace widgets
     {
-        void head_text(const std::string& text, bool centered = true)                                                                                       noexcept;
-        void body_text(const std::string& text, bool centered = true)                                                                                       noexcept;
+        void head_text(const std::string& text, bool centered = true)                                                                                                                    noexcept;
+        void body_text(const std::string& text, bool centered = true)                                                                                                                    noexcept;
 
-        bool head_button(const std::string& text, bool centered = true)                                                                                     noexcept;
-        bool body_button(const std::string& text, bool centered = true)                                                                                     noexcept;
-        bool input(char* text, const std::string& hint, ImGuiInputTextFlags flags = 0, bool centered = true)                                                    noexcept;
+        bool head_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
+        bool body_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
+        bool input(char* text, std::size_t text_size, const std::string& hint, ImGuiInputTextFlags iflags = 0, bool centered = true)                                                     noexcept;
+        bool combo(const char* label, int* current_item, const char* const items[], int items_count, int height_in_items = -1, bool centered = true)                                          noexcept;
 
-        void upper_title(const std::string& text)                                                                                                           noexcept;
+        void upper_title(const std::string& text)                                                                                                                                        noexcept;
 
-        void logo()                                                                                                                                         noexcept;
+        void logo()                                                                                                                                                                      noexcept;
 
-        bool window_with_margins(const std::string &label, float vertical_length = 0.f, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
+        bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
+        void end_window_with_margins(float vertical_margin = 0.f)                                                                                                                        noexcept;
     }
 
     namespace scales

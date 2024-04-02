@@ -4898,7 +4898,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         buf_display_end = hint + strlen(hint);
     }
 
-    ImVec2 hint_margin(20.f, 10.f);
+    ImVec2 hint_margin(20.f, -5.f);
     // Render text. We currently only render selection when the widget is active or while scrolling.
     // FIXME: We could remove the '&& render_cursor' to keep rendering selection when inactive.
     if (render_cursor || render_selection)
@@ -5043,12 +5043,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         if (is_multiline || (buf_display_end - buf_display) < buf_display_max_length)
         {
             ImU32 col = GetColorU32(is_displaying_hint ? ImGuiCol_TextDisabled : ImGuiCol_Text);
-
-            ImGui::PushFont(menu::font::foot);
-
             draw_window->DrawList->AddText(g.Font, g.FontSize, draw_pos + hint_margin - draw_scroll, col, buf_display, buf_display_end, 0.0f, is_multiline ? NULL : &clip_rect);
-
-            ImGui::PopFont();
         }
 
         // Draw blinking cursor
@@ -5083,12 +5078,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         if (is_multiline || (buf_display_end - buf_display) < buf_display_max_length)
         {
             ImU32 col = GetColorU32(is_displaying_hint ? ImGuiCol_TextDisabled : ImGuiCol_Text);
-
-            ImGui::PushFont(menu::font::foot);
-
             draw_window->DrawList->AddText(g.Font, g.FontSize, draw_pos + hint_margin, col, buf_display, buf_display_end, 0.0f, is_multiline ? NULL : &clip_rect);
-
-            ImGui::PopFont();
         }
     }
 
