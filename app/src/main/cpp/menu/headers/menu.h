@@ -45,6 +45,7 @@ namespace menu
     {
         inline ImFont* head = nullptr;
         inline ImFont* body = nullptr;
+        inline ImFont* foot = nullptr;
     }
 
     namespace widgets
@@ -66,6 +67,7 @@ namespace menu
     namespace scales
     {
         inline float option = 218.f;
+        inline float input  = 190.f;
         inline float scale  = 140.f;
         inline int   round  = 50;
         inline int   border = 0;

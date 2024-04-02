@@ -63,16 +63,19 @@ void menu::load_style() noexcept
 
     ImVec2 display_size = ImGui::GetIO().DisplaySize;
 
-    float scaled_font_size = menu::scales::scale; // base
+    float scaled_font_size = scales::scale; // base
 
     scaled_font_size *= (((display_size.x / display_size.y) < 1.5) ? 0.8f : 1.2f);
 
     static const unsigned short icons_ranges[] = { 0xe005, 0xf8ff, 0 };
 
-    menu::font::head = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size + 100.f);
+    font::head = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size + 100.f);
     io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 15.f, &icons_config, icons_ranges);
 
-    menu::font::body = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size + 20.f);
+    font::body = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size + 20.f);
+    io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 35.f, &icons_config, icons_ranges);
+
+    font::foot = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size - 20.f);
     io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 35.f, &icons_config, icons_ranges);
 }
 
@@ -90,9 +93,9 @@ bool menu::widgets::head_button(const std::string &text, bool centered) noexcept
 bool menu::widgets::body_button(const std::string &text, bool centered) noexcept { return wtools::button(font::body, text, centered); }
 
 /*
- * Input text with 'font::body' by default because I really doubt it will be used with 'font::head' lol
+ * Input text with 'font::foot' by default because I really doubt it will be used with 'font::head' or 'font::body' lol
  */
-bool menu::widgets::input(char *text, const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept { return wtools::input(font::body, text, hint, flags, centered); }
+bool menu::widgets::input(char *text, const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept { return wtools::input(font::foot, text, hint, flags, centered); }
 
 /*
  * This represents the big title on every tab seen in Hard Motion.
@@ -254,13 +257,13 @@ void menu::core::lobby::auth::log_in() noexcept
 {
     widgets::upper_title("user login");
 
-    widgets::window_with_margins("###log_in_panel", scales::option * 2);
+    widgets::window_with_margins("###log_in_panel", scales::input * 2);
 
-    char user_name[16] = {};
-    char pass_word[32] = {};
+    static char user_name[16] = {};
+    static char pass_word[32] = {};
 
     widgets::input(user_name, "user name..");
-    widgets::input(pass_word, "pass word..");
+    widgets::input(pass_word, "pass word..", ImGuiInputTextFlags_Password);
 
     ImGui::EndChild();
 

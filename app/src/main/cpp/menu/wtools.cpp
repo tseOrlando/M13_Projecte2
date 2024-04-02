@@ -104,7 +104,9 @@ bool wtools::input(ImFont *font, char* text, const std::string &hint, ImGuiInput
     /*
      * Hint always different, label different
      */
-    used = ImGui::InputText(std::string("###" + hint).c_str(), text, sizeof text, flags);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - margin);
+    used = ImGui::InputTextWithHint(std::string("###" + hint).c_str(), hint.c_str(), text, sizeof text, flags);
+    ImGui::PopItemWidth();
 
     ImGui::PopFont();
 
