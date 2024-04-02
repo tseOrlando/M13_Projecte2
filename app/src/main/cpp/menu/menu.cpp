@@ -6,6 +6,11 @@
 #include "headers/memory_images/hard_motion_logo.h"
 
 /*
+ * TODO: Call core::go_back directly and remove retarded core::change_tab flag
+ * TODO: Fix the resume of android phone stuff to save state
+ */
+
+/*
  * Here the menu is being built with the ImGui API and it's being already called
  * in 'main.cpp -> MainLaunch()', so once you launch Hard Motion you'll see the
  * result of this block of code.
@@ -23,6 +28,16 @@ void menu::spawn() noexcept
     ImGui::Begin("Hard Motion", nullptr, flags);
 
     core::go_to_tab(core::current_tab);
+
+    /*
+     * Ghetto fix, it would be easier to call 'core::go_back' in the JNI function but it crashes
+     * so well, this is how I fixed it, I don't know the problem but R.I.P good code
+     */
+    if (core::change_tab)
+    {
+        core::go_back();
+        core::change_tab = false;
+    }
 
     ImGui::End();
 
@@ -73,6 +88,11 @@ void menu::widgets::body_text(const std::string& text, bool centered) noexcept {
  */
 bool menu::widgets::head_button(const std::string &text, bool centered) noexcept { return wtools::button(font::head, text, centered); }
 bool menu::widgets::body_button(const std::string &text, bool centered) noexcept { return wtools::button(font::body, text, centered); }
+
+/*
+ * Input text with 'font::body' by default because I really doubt it will be used with 'font::head' lol
+ */
+bool menu::widgets::input(char *text, const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept { return wtools::input(font::body, text, hint, flags, centered); }
 
 /*
  * This represents the big title on every tab seen in Hard Motion.
@@ -224,7 +244,6 @@ void menu::core::lobby::landing() noexcept
     if (widgets::body_button("login"))
         core::go_to_tab(tab_t::_log_in);
 
-
     if (widgets::body_button("register"))
         core::go_to_tab(tab_t::_register_in);
 
@@ -234,6 +253,26 @@ void menu::core::lobby::landing() noexcept
 void menu::core::lobby::auth::log_in() noexcept
 {
     widgets::upper_title("user login");
+
+    widgets::window_with_margins("###log_in_panel", scales::option * 2);
+
+    char user_name[16] = {};
+    char pass_word[32] = {};
+
+    widgets::input(user_name, "user name..");
+    widgets::input(pass_word, "pass word..");
+
+    ImGui::EndChild();
+
+    widgets::window_with_margins("###options", scales::option);
+
+    if (widgets::body_button("apply"))
+    {
+        //-.-
+        core::go_to_tab(tab_t::_hub);
+    }
+
+    ImGui::EndChild();
 }
 
 void menu::core::lobby::auth::register_in() noexcept

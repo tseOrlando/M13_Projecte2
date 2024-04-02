@@ -87,3 +87,28 @@ void wtools::image(const unsigned char* data, size_t data_size, ImVec2 size, boo
 
     return;
 }
+
+bool wtools::input(ImFont *font, char* text, const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept
+{
+    bool used = false;
+
+    float margin = menu::scales::margin / 2;
+
+    ImGui::Dummy(ImVec2(0, margin));
+
+    if (centered)
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + margin);
+
+    ImGui::PushFont(font);
+
+    /*
+     * Hint always different, label different
+     */
+    used = ImGui::InputText(std::string("###" + hint).c_str(), text, sizeof text, flags);
+
+    ImGui::PopFont();
+
+    ImGui::Dummy(ImVec2(0, margin / 4));
+
+    return used;
+}

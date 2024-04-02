@@ -54,6 +54,7 @@ namespace menu
 
         bool head_button(const std::string& text, bool centered = true)                                                                                     noexcept;
         bool body_button(const std::string& text, bool centered = true)                                                                                     noexcept;
+        bool input(char* text, const std::string& hint, ImGuiInputTextFlags flags = 0, bool centered = true)                                                    noexcept;
 
         void upper_title(const std::string& text)                                                                                                           noexcept;
 
@@ -94,6 +95,8 @@ namespace menu
 
         void go_to_tab(tab_t tab) noexcept;
         void go_back()            noexcept;
+
+        inline bool change_tab = false;
 
         inline tab_t current_tab = tab_t::_landing;
 

@@ -15,9 +15,10 @@
  */
 namespace wtools
 {
-    void text(ImFont* font, const std::string& text, bool centered)                     noexcept;
-    bool button(ImFont* font, const std::string& text, bool centered)                   noexcept;
-    void image(const unsigned char* data, size_t data_size, ImVec2 size, bool centered) noexcept;
+    void text(ImFont* font, const std::string& text, bool centered)                                                      noexcept;
+    bool button(ImFont* font, const std::string& text, bool centered)                                                    noexcept;
+    bool input(ImFont* font, char* text, const std::string& hint, ImGuiInputTextFlags flags, bool centered)              noexcept;
+    void image(const unsigned char* data, size_t data_size, ImVec2 size, bool centered)                                  noexcept;
 }
 
 /*
