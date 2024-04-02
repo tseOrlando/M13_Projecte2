@@ -76,7 +76,7 @@ void menu::load_style() noexcept
     io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 35.f, &icons_config, icons_ranges);
 
     font::foot = io.Fonts->AddFontFromMemoryTTF(&man_rope, sizeof man_rope, scaled_font_size - 20.f);
-    io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 35.f, &icons_config, icons_ranges);
+    io.Fonts->AddFontFromMemoryCompressedTTF(icons_data, icons_size, scaled_font_size - 55.f, &icons_config, icons_ranges);
 }
 
 /*
@@ -95,7 +95,7 @@ bool menu::widgets::body_button(const std::string &text, bool centered) noexcept
 /*
  * Input text with 'font::foot' by default because I really doubt it will be used with 'font::head' or 'font::body' lol
  */
-bool menu::widgets::input(char *text, const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept { return wtools::input(font::foot, text, hint, flags, centered); }
+bool menu::widgets::input(char *text, const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept { return wtools::input(font::body, text, hint, flags, centered); }
 
 /*
  * This represents the big title on every tab seen in Hard Motion.
@@ -262,8 +262,8 @@ void menu::core::lobby::auth::log_in() noexcept
     static char user_name[16] = {};
     static char pass_word[32] = {};
 
-    widgets::input(user_name, "user name..");
-    widgets::input(pass_word, "pass word..", ImGuiInputTextFlags_Password);
+    widgets::input(user_name, "username..");
+    widgets::input(pass_word, "password..", ImGuiInputTextFlags_Password);
 
     ImGui::EndChild();
 
