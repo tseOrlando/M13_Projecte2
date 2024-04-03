@@ -88,6 +88,12 @@ void wtools::image(const unsigned char* data, size_t data_size, ImVec2 size, boo
     return;
 }
 
+/*
+ * This function is all-in-one for input transformation
+ * You can :
+ * - Change the font
+ * - Center it
+ */
 bool wtools::input(ImFont *font, char* text, std::size_t text_size,  const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept
 {
     bool used = false;
@@ -115,9 +121,9 @@ bool wtools::input(ImFont *font, char* text, std::size_t text_size,  const std::
     return used;
 }
 
-bool wtools::combo(ImFont *font, const char *label, int *current_item, const char *const *items, int items_count, bool centered, int height_in_items) noexcept
+const char* wtools::combo(ImFont* font, const char *label, const char* preview_value, std::vector<const char*> items, bool centered) noexcept
 {
-    bool used = false;
+    const char* selected_item;
 
     float margin = menu::scales::margin / 2;
 
@@ -127,14 +133,20 @@ bool wtools::combo(ImFont *font, const char *label, int *current_item, const cha
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + margin);
 
     ImGui::PushFont(font);
-
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - margin);
-    used = ImGui::Combo(label, current_item, items, IM_ARRAYSIZE(items), items_count);
-    ImGui::PopItemWidth();
+    if (ImGui::BeginCombo(label, preview_value))
+    {
+        for (const char* item : items)
+            if (ImGui::Selectable(item))
+                selected_item = item;
 
+        ImGui::EndCombo();
+    }
+
+    ImGui::PopItemWidth();
     ImGui::PopFont();
 
     ImGui::Dummy(ImVec2(0, margin / 4));
 
-    return used;
+    return selected_item;
 }

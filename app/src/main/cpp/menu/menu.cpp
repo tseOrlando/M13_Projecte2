@@ -98,6 +98,11 @@ bool menu::widgets::body_button(const std::string &text, bool centered) noexcept
 bool menu::widgets::input(char* text, std::size_t text_size, const std::string &hint, ImGuiInputTextFlags iflags, bool centered) noexcept { return wtools::input(font::body, text, text_size, hint, iflags, centered); }
 
 /*
+ * Wrapped combo to be used, nothing else to comment to this
+ */
+const char* menu::widgets::combo(const char *label, const char *preview_value, std::vector<const char*> items,bool centered) noexcept { return wtools::combo(font::body, label, preview_value, items, centered); }
+
+/*
  * This represents the big title on every tab seen in Hard Motion.
  *
  * The BeginChild text will have a '###'.
@@ -153,11 +158,6 @@ void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
     if (vertical_margin != 0.f)
         ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, vertical_margin));
 }
-
-/*
- * Wrapped combo adapted to hard-motion context
- */
-bool menu::widgets::combo(const char *label, int *current_item, const char *const *items, int items_count, int height_in_items, bool centered) noexcept { return wtools::combo(font::body, label, current_item, items, items_count, centered, height_in_items); }
 
 /*
  * This function will update the tabs visually.
@@ -272,7 +272,7 @@ void menu::core::lobby::landing() noexcept
 }
 
 /*
- * This and register are same stuff, but i will keep the redundancy in this 2 ones in order to be maintainable
+ * This and register are same stuff, but I will keep the redundancy in this 2 ones in order to be maintainable
  */
 void menu::core::lobby::auth::log_in() noexcept
 {
@@ -280,20 +280,14 @@ void menu::core::lobby::auth::log_in() noexcept
 
     widgets::window_with_margins("###log_in_panel", scales::input * 2, scales::margin * 10);
 
-    /*
-     * diff cuz of the data
-     */
-    static char user_name[16] = {};
-    static char pass_word[16] = {};
-
-    widgets::input(user_name, sizeof user_name, "username..");
-    widgets::input(pass_word, sizeof pass_word, "password..", ImGuiInputTextFlags_Password);
+    widgets::input(values::user_data::user_name, sizeof values::user_data::user_name, "username..");
+    widgets::input(values::user_data::pass_word, sizeof values::user_data::pass_word, "password..", ImGuiInputTextFlags_Password);
 
     widgets::end_window_with_margins(scales::margin * 9);
 
     widgets::window_with_margins("###options", scales::option);
 
-    if (widgets::body_button("apply"))
+    if (widgets::body_button("login"))
     {
         //-.-
         core::go_to_tab(tab_t::_hub);
@@ -303,33 +297,22 @@ void menu::core::lobby::auth::log_in() noexcept
 }
 
 /*
- * This and login are same stuff, but i will keep the redundancy in this 2 ones in order to be maintainable
+ * This and login are same stuff, but I will keep the redundancy in this 2 ones in order to be maintainable
  */
 void menu::core::lobby::auth::register_in() noexcept
 {
     widgets::upper_title("user register");
 
-    widgets::window_with_margins("###register_in_panel", scales::input * 5, scales::margin * 7);
+    widgets::window_with_margins("###register_in_panel", scales::input * 5, scales::margin * 4);
 
-    /*
-     * diff cuz of the data
-     */
-    static char user_name[16] = {};
-    static char pass_word[16] = {};
-    static char e_mail[32]    = {};
-    static char number[9]     = {};
+    widgets::input(values::user_data::user_name, sizeof values::user_data::user_name, "username..");
+    widgets::input(values::user_data::pass_word, sizeof values::user_data::pass_word, "password..", ImGuiInputTextFlags_Password);
+    widgets::input(values::user_data::e_mail, sizeof values::user_data::e_mail, "e-mail..");
+    widgets::input(values::user_data::number, sizeof values::user_data::number, "number..");
 
-    widgets::input(user_name, sizeof user_name, "username..");
-    widgets::input(pass_word, sizeof pass_word, "password..", ImGuiInputTextFlags_Password);
-    widgets::input(e_mail, sizeof e_mail, "e-mail..");
-    widgets::input(number, sizeof number, "number..");
+    values::user_data::dance = widgets::combo("###dances", "type of dance", values::dances);
 
-    static const char* dances[] = { "jumpstyle", "gabber/hakken", "hard-tek" };
-    static int current_item     = 0;
-
-    widgets::combo("##dances", &current_item, dances, IM_ARRAYSIZE(dances));
-
-    widgets::end_window_with_margins(scales::margin * 7);
+    widgets::end_window_with_margins(scales::margin * 4);
 
     widgets::window_with_margins("###options", scales::option);
 

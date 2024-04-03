@@ -22,6 +22,20 @@ namespace menu
 
     constexpr int flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
+    namespace values
+    {
+        inline std::vector<const char *> dances = {"jumpstyle", "gabber/hakken", "shuffle" };
+
+        namespace user_data
+        {
+            inline char user_name[16] = {};
+            inline char pass_word[16] = {};
+            inline char e_mail[32]    = {};
+            inline char number[9]     = {};
+            inline const char* dance;
+        }
+    }
+
     namespace colors
     {
         inline float global_alpha = 255.f;
@@ -56,7 +70,7 @@ namespace menu
         bool head_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
         bool body_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
         bool input(char* text, std::size_t text_size, const std::string& hint, ImGuiInputTextFlags iflags = 0, bool centered = true)                                                     noexcept;
-        bool combo(const char* label, int* current_item, const char* const items[], int items_count, int height_in_items = -1, bool centered = true)                                          noexcept;
+        const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true)                                                            noexcept;
 
         void upper_title(const std::string& text)                                                                                                                                        noexcept;
 
