@@ -123,7 +123,7 @@ bool wtools::input(ImFont *font, char* text, std::size_t text_size,  const std::
 
 const char* wtools::combo(ImFont* font, const char *label, const char* preview_value, std::vector<const char*> items, bool centered) noexcept
 {
-    const char* selected_item;
+    const char* selected_item = preview_value;
 
     float margin = menu::scales::margin / 2;
 
@@ -138,7 +138,10 @@ const char* wtools::combo(ImFont* font, const char *label, const char* preview_v
     {
         for (const char* item : items)
             if (ImGui::Selectable(item))
+            {
                 selected_item = item;
+                preview_value = item;
+            }
 
         ImGui::EndCombo();
     }

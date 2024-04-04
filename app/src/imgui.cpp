@@ -6667,12 +6667,12 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
             // Using SetNextWindowSize() overrides ImGuiWindowFlags_AlwaysAutoResize, so it can be used on tooltips/popups, etc.
             if (!window_size_x_set_by_api)
             {
-                window->SizeFull.x = size_auto_fit.x;
+                window->SizeFull.x = ImLerp(window->SizeFull.x, size_auto_fit.x, 0.1f);
                 use_current_size_for_scrollbar_x = true;
             }
             if (!window_size_y_set_by_api)
             {
-                window->SizeFull.y = size_auto_fit.y;
+                window->SizeFull.y = ImLerp(window->SizeFull.y, size_auto_fit.y, 0.1f);
                 use_current_size_for_scrollbar_y = true;
             }
         }

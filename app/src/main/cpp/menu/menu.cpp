@@ -303,14 +303,18 @@ void menu::core::lobby::auth::register_in() noexcept
 {
     widgets::upper_title("user register");
 
-    widgets::window_with_margins("###register_in_panel", scales::input * 5, scales::margin * 4);
+    widgets::window_with_margins("###register_in_panel", (scales::input * 4) + scales::combo, scales::margin * 4);
 
     widgets::input(values::user_data::user_name, sizeof values::user_data::user_name, "username..");
     widgets::input(values::user_data::pass_word, sizeof values::user_data::pass_word, "password..", ImGuiInputTextFlags_Password);
     widgets::input(values::user_data::e_mail, sizeof values::user_data::e_mail, "e-mail..");
     widgets::input(values::user_data::number, sizeof values::user_data::number, "number..");
 
-    values::user_data::dance = widgets::combo("###dances", "type of dance", values::dances);
+    /*
+     * kek
+     */
+    static const char* current_value = "type of dance";
+    current_value = values::user_data::dance = widgets::combo("###dances", current_value, values::dances);
 
     widgets::end_window_with_margins(scales::margin * 4);
 

@@ -84,6 +84,7 @@ namespace menu
     {
         inline float option = 218.f;
         inline float input  = 190.f;
+        inline float combo  = 160.f;
         inline float scale  = 140.f;
         inline int   round  = 50;
         inline int   border = 0;
