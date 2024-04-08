@@ -6590,6 +6590,13 @@ bool ImGui::CollapsingHeader(const char* label, bool* p_visible, ImGuiTreeNodeFl
 // But you need to make sure the ID is unique, e.g. enclose calls in PushID/PopID or use ##unique_id.
 // With this scheme, ImGuiSelectableFlags_SpanAllColumns and ImGuiSelectableFlags_AllowOverlap are also frequently used flags.
 // FIXME: Selectable() with (size.x == 0.0f) and (SelectableTextAlign.x > 0.0f) followed by SameLine() is currently not supported.
+
+struct selectable_anim
+{
+    int hover_fade;
+    int change_of_color_font;
+};
+
 bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags flags, const ImVec2& size_arg)
 {
     ImGuiWindow* window = GetCurrentWindow();
@@ -6625,8 +6632,8 @@ bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags fl
     {
         const float spacing_x = span_all_columns ? 0.0f : style.ItemSpacing.x;
         const float spacing_y = style.ItemSpacing.y;
-        const float spacing_L = IM_TRUNC(spacing_x * 0.50f);
-        const float spacing_U = IM_TRUNC(spacing_y * 0.50f);
+        const float spacing_L = IM_FLOOR(spacing_x * 0.50f);
+        const float spacing_U = IM_FLOOR(spacing_y * 0.50f);
         bb.Min.x -= spacing_L;
         bb.Min.y -= spacing_U;
         bb.Max.x += (spacing_x - spacing_L);
@@ -6634,7 +6641,7 @@ bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags fl
     }
     //if (g.IO.KeyCtrl) { GetForegroundDrawList()->AddRect(bb.Min, bb.Max, IM_COL32(0, 255, 0, 255)); }
 
-    // Modify ClipRect for the ItemAdd(), faster than doing a PushColumnsBackground/PushTableBackgroundChannel for every Selectable..
+    // Modify ClipRect for the ItemAdd(), faster than doing a PushColumnsBackground/PushTableBackground for every Selectable..
     const float backup_clip_rect_min_x = window->ClipRect.Min.x;
     const float backup_clip_rect_max_x = window->ClipRect.Max.x;
     if (span_all_columns)
@@ -6660,15 +6667,10 @@ bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags fl
 
     // FIXME: We can standardize the behavior of those two, we could also keep the fast path of override ClipRect + full push on render only,
     // which would be advantageous since most selectable are not selected.
-    if (span_all_columns)
-    {
-        if (g.CurrentTable)
-            TablePushBackgroundChannel();
-        else if (window->DC.CurrentColumns)
-            PushColumnsBackground();
-        g.LastItemData.StatusFlags |= ImGuiItemStatusFlags_HasClipRect;
-        g.LastItemData.ClipRect = window->ClipRect;
-    }
+    if (span_all_columns && window->DC.CurrentColumns)
+        PushColumnsBackground();
+    else if (span_all_columns && g.CurrentTable)
+        TablePushBackgroundChannel();
 
     // We use NoHoldingActiveID on menus so user can click and _hold_ on a menu then drag to browse child entries
     ImGuiButtonFlags button_flags = 0;
@@ -6677,7 +6679,7 @@ bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags fl
     if (flags & ImGuiSelectableFlags_SelectOnClick)     { button_flags |= ImGuiButtonFlags_PressedOnClick; }
     if (flags & ImGuiSelectableFlags_SelectOnRelease)   { button_flags |= ImGuiButtonFlags_PressedOnRelease; }
     if (flags & ImGuiSelectableFlags_AllowDoubleClick)  { button_flags |= ImGuiButtonFlags_PressedOnClickRelease | ImGuiButtonFlags_PressedOnDoubleClick; }
-    if ((flags & ImGuiSelectableFlags_AllowOverlap) || (g.LastItemData.InFlags & ImGuiItemFlags_AllowOverlap)) { button_flags |= ImGuiButtonFlags_AllowOverlap; }
+    if (flags & ImGuiSelectableFlags_AllowItemOverlap)  { button_flags |= ImGuiButtonFlags_AllowOverlap; }
 
     const bool was_selected = selected;
     bool hovered, held;
@@ -6706,29 +6708,53 @@ bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags fl
     if (pressed)
         MarkItemEdited(id);
 
+    if (flags & ImGuiSelectableFlags_AllowItemOverlap)
+        SetItemAllowOverlap();
+
     // In this branch, Selectable() cannot toggle the selection so this will never trigger.
     if (selected != was_selected) //-V547
         g.LastItemData.StatusFlags |= ImGuiItemStatusFlags_ToggledSelection;
 
+    static std::map<ImGuiID, selectable_anim> anim;
+    auto it_anim = anim.find(id);
+    if (it_anim == anim.end())
+    {
+        anim.insert({ id, {0} });
+        it_anim = anim.find(id);
+    }
+
     // Render
-    if (hovered || selected)
-    {
-        const ImU32 col = GetColorU32((held && hovered) ? ImGuiCol_HeaderActive : hovered ? ImGuiCol_HeaderHovered : ImGuiCol_Header);
-        RenderFrame(bb.Min, bb.Max, col, false, 0.0f);
-    }
 
-    if (g.NavId == id)
-        RenderNavHighlight(bb, id, ImGuiNavHighlightFlags_Compact | ImGuiNavHighlightFlags_NoRounding);
+    ImColor col(static_cast<int>(menu::colors::global_red), static_cast<int>(menu::colors::global_green), static_cast<int>(menu::colors::global_blue), it_anim->second.hover_fade);
+    RenderFrame(bb.Min, bb.Max, col, false, menu::scales::round);
 
-    if (span_all_columns)
-    {
-        if (g.CurrentTable)
-            TablePopBackgroundChannel();
-        else if (window->DC.CurrentColumns)
-            PopColumnsBackground();
-    }
+    if (hovered) it_anim->second.hover_fade += 4 / GetIO().Framerate * 160.f;
+    else it_anim->second.hover_fade -= 4 / GetIO().Framerate * 160.f;
 
-    RenderTextClipped(text_min, text_max, label, NULL, &label_size, style.SelectableTextAlign, &bb);
+    if (it_anim->second.hover_fade > 255) it_anim->second.hover_fade = 255;
+    else if (it_anim->second.hover_fade < 0) it_anim->second.hover_fade = 0;
+
+    if (hovered)it_anim->second.change_of_color_font += 5 / GetIO().Framerate * 160.f;
+    else it_anim->second.change_of_color_font -= 5 / GetIO().Framerate * 160.f;
+
+    if (it_anim->second.change_of_color_font > 255) it_anim->second.change_of_color_font = 255;
+    else if (it_anim->second.change_of_color_font < 0) it_anim->second.change_of_color_font = 0;
+
+    RenderNavHighlight(bb, id, ImGuiNavHighlightFlags_Compact | ImGuiNavHighlightFlags_NoRounding);
+
+    if (span_all_columns && window->DC.CurrentColumns)
+        PopColumnsBackground();
+    else if (span_all_columns && g.CurrentTable)
+        TablePopBackgroundChannel();
+
+    PushStyleColor(ImGuiCol_Text, ColorConvertFloat4ToU32(ImColor(255, 255, 255, static_cast<int>(menu::colors::global_alpha) - it_anim->second.change_of_color_font)));
+    RenderTextClipped(ImVec2(20.f, 0) + text_min, text_max, label, NULL, &label_size, style.SelectableTextAlign, &bb);
+    ImGui::PopStyleColor();
+
+    ImVec4* c = GetStyle().Colors;
+    PushStyleColor(ImGuiCol_Text, ColorConvertFloat4ToU32(ImColor(48, 48, 48, static_cast<int>(it_anim->second.change_of_color_font))));
+    RenderTextClipped(ImVec2(20.f, 0) + text_min, text_max, label, NULL, &label_size, style.SelectableTextAlign, &bb);
+    ImGui::PopStyleColor();
 
     // Automatically close popups
     if (pressed && (window->Flags & ImGuiWindowFlags_Popup) && !(flags & ImGuiSelectableFlags_DontClosePopups) && !(g.LastItemData.InFlags & ImGuiItemFlags_SelectableDontClosePopup))

@@ -332,6 +332,20 @@ void menu::core::lobby::auth::register_in() noexcept
 void menu::core::lobby::main::hub() noexcept
 {
     widgets::upper_title("hard motion");
+
+
+    widgets::window_with_margins("###hub", scales::option * 3, scales::margin * 7);
+
+    if (widgets::body_button("events"))
+        core::go_to_tab(core::tab_t::_events);
+
+    if (widgets::body_button("search"))
+        core::go_to_tab(core::tab_t::_search);
+
+    if (widgets::body_button("user"))
+        core::go_to_tab(core::tab_t::_user);
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::events::events() noexcept

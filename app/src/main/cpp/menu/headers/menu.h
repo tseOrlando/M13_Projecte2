@@ -33,6 +33,8 @@ namespace menu
             inline char e_mail[32]    = {};
             inline char number[9]     = {};
             inline const char* dance;
+
+            inline bool logged_in = false;
         }
     }
 
@@ -118,8 +120,6 @@ namespace menu
         inline bool change_tab = false;
 
         inline tab_t current_tab = tab_t::_landing;
-
-        inline std::map<int, bool> tabs;
 
         namespace lobby
         {
