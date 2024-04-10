@@ -82,8 +82,8 @@ void menu::load_style() noexcept
 /*
  * Memory based head and body fonts wrapped in 1 function in order to operate fast
  */
-void menu::widgets::head_text(const std::string& text, bool centered) noexcept { wtools::text(font::head, text, centered); }
-void menu::widgets::body_text(const std::string& text, bool centered) noexcept { wtools::text(font::body, text, centered); }
+void menu::widgets::head_text(const std::string& text, bool multi_line, bool centered) noexcept { wtools::text(font::head, text, multi_line, centered); }
+void menu::widgets::body_text(const std::string& text, bool multi_line, bool centered) noexcept { wtools::text(font::body, text, multi_line, centered); }
 
 /*
  * Buttons wrapped in their different fonts in order to use them without the problem
@@ -157,6 +157,32 @@ void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
 
     if (vertical_margin != 0.f)
         ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, vertical_margin));
+}
+
+/*
+ * This function is used to display event data, the void func is the function
+ * that will be called when clicked the info button inside of it, you will need
+ * to make a lambda function outside of this function call in order to add it on
+ * the parameters
+ */
+bool menu::widgets::window_surface_info(const std::string &label, const std::string& info, std::function<void(const std::string& title, const std::string& content)> post_call_func, float vertical_length, float vertical_margin) noexcept
+{
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, colors::widgets);
+
+    bool used = window_with_margins("###" + label, vertical_length, vertical_margin);
+
+    ImGui::PopStyleColor();
+
+    widgets::body_text(label);
+
+    widgets::body_text(info, true, false);
+
+    if (widgets::body_button("info"))
+        post_call_func(label, info);
+
+    end_window_with_margins(vertical_margin);
+
+    return used;
 }
 
 /*
@@ -289,8 +315,8 @@ void menu::core::lobby::auth::log_in() noexcept
 
     if (widgets::body_button("login"))
     {
-        //-.-
-        core::go_to_tab(tab_t::_hub);
+        //-.- check
+        go_to_tab(tab_t::_hub);
     }
 
     widgets::end_window_with_margins();
@@ -322,8 +348,8 @@ void menu::core::lobby::auth::register_in() noexcept
 
     if (widgets::body_button("register"))
     {
-        //-.-
-        core::go_to_tab(tab_t::_hub);
+        //-.- check
+        go_to_tab(tab_t::_hub);
     }
 
     widgets::end_window_with_margins();
@@ -333,17 +359,16 @@ void menu::core::lobby::main::hub() noexcept
 {
     widgets::upper_title("hard motion");
 
-
     widgets::window_with_margins("###hub", scales::option * 3, scales::margin * 7);
 
     if (widgets::body_button("events"))
-        core::go_to_tab(core::tab_t::_events);
+        go_to_tab(tab_t::_events);
 
     if (widgets::body_button("search"))
-        core::go_to_tab(core::tab_t::_search);
+        go_to_tab(tab_t::_search);
 
     if (widgets::body_button("user"))
-        core::go_to_tab(core::tab_t::_user);
+        go_to_tab(tab_t::_user);
 
     widgets::end_window_with_margins();
 }
@@ -351,6 +376,44 @@ void menu::core::lobby::main::hub() noexcept
 void menu::core::lobby::main::events::events() noexcept
 {
     widgets::upper_title("events");
+
+    widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
+
+    widgets::input(values::search, sizeof values::search, "event..");
+
+    widgets::end_window_with_margins(scales::margin);
+
+    widgets::window_with_margins("###events", scales::option * 4, scales::margin, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+    /*
+     * sample data
+     */
+    for (int i = 0; i <= 10; i++)
+    {
+        auto data = [](const std::string& title, const std::string& content)
+        {
+            //management
+        };
+
+        std::string event = "event nº " + std::to_string(i);
+        std::string info  = "event info .. text lorem ipsum";
+
+        widgets::window_surface_info(event, info, data, scales::event, scales::margin);
+    }
+
+    widgets::end_window_with_margins(scales::margin);
+
+    widgets::window_with_margins("###events_options", scales::option, scales::margin * 3);
+
+    if (widgets::body_button("create"))
+        go_to_tab(tab_t::_create_event);
+
+    ImGui::SameLine();
+
+    if (widgets::body_button("joined", false))
+        go_to_tab(tab_t::_joined_events);
+
+    widgets::end_window_with_margins(scales::margin);
 }
 
 void menu::core::lobby::main::events::event_info() noexcept

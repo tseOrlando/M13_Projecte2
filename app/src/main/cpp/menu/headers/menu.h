@@ -25,6 +25,7 @@ namespace menu
     namespace values
     {
         inline std::vector<const char *> dances = {"jumpstyle", "gabber/hakken", "shuffle" };
+        inline char search[32] = {};
 
         namespace user_data
         {
@@ -66,20 +67,21 @@ namespace menu
 
     namespace widgets
     {
-        void head_text(const std::string& text, bool centered = true)                                                                                                                    noexcept;
-        void body_text(const std::string& text, bool centered = true)                                                                                                                    noexcept;
+        void head_text(const std::string& text, bool multi_line = false, bool centered = true)                                                                                                                    noexcept;
+        void body_text(const std::string& text, bool multi_line = false, bool centered = true)                                                                                                                    noexcept;
 
         bool head_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
         bool body_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
         bool input(char* text, std::size_t text_size, const std::string& hint, ImGuiInputTextFlags iflags = 0, bool centered = true)                                                     noexcept;
         const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true)                                                            noexcept;
-
         void upper_title(const std::string& text)                                                                                                                                        noexcept;
 
         void logo()                                                                                                                                                                      noexcept;
 
         bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
         void end_window_with_margins(float vertical_margin = 0.f)                                                                                                                        noexcept;
+
+        bool window_surface_info(const std::string &label, const std::string& info, std::function<void(const std::string& title, const std::string& content)> post_call_func, float vertical_length = 0.f, float vertical_margin = 0.f)                                                                     noexcept;
     }
 
     namespace scales
@@ -88,6 +90,7 @@ namespace menu
         inline float input  = 190.f;
         inline float combo  = 160.f;
         inline float scale  = 140.f;
+        inline float event  = 300.f;
         inline int   round  = 50;
         inline int   border = 0;
         inline float margin = 50.f;

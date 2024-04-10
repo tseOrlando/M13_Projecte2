@@ -15,7 +15,7 @@
  */
 namespace wtools
 {
-    void text(ImFont* font, const std::string& text, bool centered)                                                                                     noexcept;
+    void text(ImFont* font, const std::string& text, bool multi_line, bool centered)                                                                                     noexcept;
     bool button(ImFont* font, const std::string& text, bool centered)                                                                                   noexcept;
     bool input(ImFont* font, char* text, std::size_t text_size,  const std::string& hint, ImGuiInputTextFlags flags, bool centered)                     noexcept;
     const char* combo(ImFont* font, const char *label, const char* preview_value, std::vector<const char*> items, bool centered)                        noexcept;

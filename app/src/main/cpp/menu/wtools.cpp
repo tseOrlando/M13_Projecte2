@@ -15,13 +15,14 @@
  * - Change the font
  * - Center it
  */
-void wtools::text(ImFont* font, const std::string& text, bool centered) noexcept
+void wtools::text(ImFont* font, const std::string& text, bool multi_line, bool centered) noexcept
 {
     if (centered)
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(text.c_str()).x) * 0.5f);
 
     ImGui::PushFont(font);
-    ImGui::Text("%s", text.c_str());
+    if (multi_line) ImGui::TextWrapped("%s", text.c_str());
+    else ImGui::Text("%s", text.c_str());
     ImGui::PopFont();
 }
 
