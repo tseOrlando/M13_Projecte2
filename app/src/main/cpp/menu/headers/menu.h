@@ -67,8 +67,11 @@ namespace menu
 
     namespace widgets
     {
-        void head_text(const std::string& text, bool multi_line = false, bool centered = true)                                                                                                                    noexcept;
-        void body_text(const std::string& text, bool multi_line = false, bool centered = true)                                                                                                                    noexcept;
+        void head_text(const std::string& text, bool disabled = false, bool centered = true)                                                                    noexcept;
+        void body_text(const std::string& text, bool disabled = false, bool centered = true)                                                                    noexcept;
+        void foot_text(const std::string& text, bool disabled = false, bool centered = true)                                                                    noexcept;
+
+        //TODO: void head_wrapped_text
 
         bool head_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
         bool body_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;

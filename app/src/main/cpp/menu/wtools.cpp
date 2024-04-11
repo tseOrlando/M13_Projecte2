@@ -15,15 +15,91 @@
  * - Change the font
  * - Center it
  */
-void wtools::text(ImFont* font, const std::string& text, bool multi_line, bool centered) noexcept
+void wtools::text(ImFont* font, const std::string& text, bool disabled, bool centered) noexcept
 {
     if (centered)
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(text.c_str()).x) * 0.5f);
 
     ImGui::PushFont(font);
-    if (multi_line) ImGui::TextWrapped("%s", text.c_str());
-    else ImGui::Text("%s", text.c_str());
+    if (!disabled) ImGui::Text("%s", text.c_str());
+    else ImGui::TextDisabled("%s", text.c_str());
     ImGui::PopFont();
+}
+
+/*
+ * Centers wrapped text in order to have centered wrapped text, a thing ImGui
+ * doesn't have by default
+ *
+ * PD: This ain't mine, it's from : 'https://github.com/ocornut/imgui/issues/4465'
+ * I just took out some external functions and added them as lambdas
+ */ //TODO: IMPLEMENT WITH FONT
+void wtools::wrapped_text(ImFont* font, std::string text, ImVec2 position, int boundary_width, int lines, int y_padding) noexcept
+{
+    auto str_to_vec = [](std::string str, std::string token)
+    {
+        std::vector<std::string> result;
+        while (str.size())
+        {
+            int index = str.find(token);
+            if (index != std::string::npos)
+            {
+                result.push_back(str.substr(0, index));
+                str = str.substr(index + token.size());
+                if (str.size() == 0)
+                    result.push_back(str);
+            }
+            else
+            {
+                result.push_back(str);
+                str = "";
+            }
+        }
+        return result;
+    };
+
+    auto dc_text = [](ImVec2 position, ImVec2 boundary, ImVec2 char_size, int idx, std::string text, int y_padding = 3)
+    {
+        ImVec2 render_pos;
+        ImVec2 line_size = ImGui::CalcTextSize(text.c_str());
+        render_pos.x = position.x + ((boundary.x / 2) - ((line_size.x + char_size.x) / 2)); // horizontal position centered in boundary x
+        render_pos.y = position.y + ((idx * line_size.y) + y_padding);
+        ImGui::RenderText(render_pos, text.c_str(), 0, false);
+    };
+
+    ImVec2 char_size = ImGui::CalcTextSize("X");
+    std::vector<std::string> words = str_to_vec(text, " ");
+
+    int line_cnt = 0; // 0 is first line
+    int word_cnt = 0; // 0 is first word / vector item
+    int line_x = 0;   // space already used on line
+    std::string line_text = "";
+
+    for (auto &word : words)
+    {
+        word_cnt++;
+        int word_size = (word.length() + 1) * char_size.x; // size of this word in pixels, plus one space
+
+        if ((line_x + word_size < boundary_width)) // if word will fit in space available
+        {
+            line_text += word + " "; // add it
+            line_x += word_size;     // reduce the available space
+            if (word_cnt == words.size()) // last one
+            {
+                dc_text(position, ImVec2(boundary_width, boundary_width), char_size, line_cnt, line_text.c_str());
+                continue;
+            }
+        }
+
+        else // word won't fit on this line, so draw current line, then start next line...
+        {
+            dc_text(position, ImVec2(boundary_width, boundary_width), char_size, line_cnt, line_text.c_str());
+            // clear line_x and line_text, increment line_cnt
+            line_text = word + " ";
+            line_x = 0;
+            line_cnt++;
+            continue;
+        }
+    }
 }
 
 /*

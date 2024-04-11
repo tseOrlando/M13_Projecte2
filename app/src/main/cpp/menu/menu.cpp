@@ -82,8 +82,9 @@ void menu::load_style() noexcept
 /*
  * Memory based head and body fonts wrapped in 1 function in order to operate fast
  */
-void menu::widgets::head_text(const std::string& text, bool multi_line, bool centered) noexcept { wtools::text(font::head, text, multi_line, centered); }
-void menu::widgets::body_text(const std::string& text, bool multi_line, bool centered) noexcept { wtools::text(font::body, text, multi_line, centered); }
+void menu::widgets::head_text(const std::string& text, bool disabled, bool centered) noexcept { wtools::text(font::head, text, disabled, centered); }
+void menu::widgets::body_text(const std::string& text, bool disabled, bool centered) noexcept { wtools::text(font::body, text, disabled, centered); }
+void menu::widgets::foot_text(const std::string& text, bool disabled, bool centered) noexcept { wtools::text(font::foot, text, disabled, centered); }
 
 /*
  * Buttons wrapped in their different fonts in order to use them without the problem
@@ -175,7 +176,7 @@ bool menu::widgets::window_surface_info(const std::string &label, const std::str
 
     widgets::body_text(label);
 
-    widgets::body_text(info, true, false);
+    widgets::foot_text(info, true, true, true);
 
     if (widgets::body_button("info"))
         post_call_func(label, info);
@@ -184,6 +185,8 @@ bool menu::widgets::window_surface_info(const std::string &label, const std::str
 
     return used;
 }
+
+
 
 /*
  * This function will update the tabs visually.
@@ -398,7 +401,7 @@ void menu::core::lobby::main::events::events() noexcept
         std::string event = "event nº " + std::to_string(i);
         std::string info  = "event info .. text lorem ipsum";
 
-        widgets::window_surface_info(event, info, data, scales::event, scales::margin);
+        widgets::window_surface_info(event, info, data, scales::event, scales::margin / 3);
     }
 
     widgets::end_window_with_margins(scales::margin);
