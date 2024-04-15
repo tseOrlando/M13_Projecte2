@@ -5,6 +5,9 @@
 #include "../menu/headers/menu.h"
 #include "headers/memory_images/hard_motion_logo.h"
 
+#include "entities/event_t.h"
+#include "entities/member_t.h"
+
 /*
  * TODO: Call core::go_back directly and remove retarded core::change_tab flag
  * TODO: Fix the resume of android phone stuff to save state
@@ -92,6 +95,7 @@ void menu::widgets::foot_text(const std::string& text, bool disabled, bool cente
  */
 bool menu::widgets::head_button(const std::string &text, bool centered) noexcept { return wtools::button(font::head, text, centered); }
 bool menu::widgets::body_button(const std::string &text, bool centered) noexcept { return wtools::button(font::body, text, centered); }
+bool menu::widgets::foot_button(const std::string &text, bool centered) noexcept { return wtools::button(font::foot, text, centered); }
 
 /*
  * Input text with 'font::foot' by default because I really doubt it will be used with 'font::head' or 'font::body' lol
@@ -170,23 +174,25 @@ bool menu::widgets::window_surface_info(const std::string &label, const std::str
 {
     ImGui::PushStyleColor(ImGuiCol_ChildBg, colors::widgets);
 
-    bool used = window_with_margins("###" + label, vertical_length, vertical_margin);
+    bool used = window_with_margins("###" + label, vertical_length, vertical_margin / 2, ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar);
 
     ImGui::PopStyleColor();
 
-    widgets::body_text(label);
+    widgets::foot_text(label);
 
-    widgets::foot_text(info, true, true, true);
+    widgets::foot_text(wtools::get_curiosity_text(info), true);
 
-    if (widgets::body_button("info"))
+    if (widgets::foot_button("info"))
         post_call_func(label, info);
 
     end_window_with_margins(vertical_margin);
 
     return used;
 }
-
-
+/*
+ * Automatically centered wrapped text (Multi-Line Text) from ImGui
+ */
+void menu::widgets::body_wrapped_text(const std::string &text, ImVec2 pos, int boundary_width) noexcept { wtools::wrapped_text(font::body, text, pos, boundary_width); }
 
 /*
  * This function will update the tabs visually.
@@ -384,9 +390,9 @@ void menu::core::lobby::main::events::events() noexcept
 
     widgets::input(values::search, sizeof values::search, "event..");
 
-    widgets::end_window_with_margins(scales::margin);
+    widgets::end_window_with_margins(scales::margin / 5);
 
-    widgets::window_with_margins("###events", scales::option * 4, scales::margin, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+    widgets::window_with_margins("###events", scales::option * 4, scales::margin / 5, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
     /*
      * sample data
@@ -395,28 +401,26 @@ void menu::core::lobby::main::events::events() noexcept
     {
         auto data = [](const std::string& title, const std::string& content)
         {
-            //management
+
         };
 
         std::string event = "event nº " + std::to_string(i);
-        std::string info  = "event info .. text lorem ipsum";
+        std::string info  = "event info text " + std::to_string(i) + "data aaaa dataaa";
 
         widgets::window_surface_info(event, info, data, scales::event, scales::margin / 3);
     }
 
-    widgets::end_window_with_margins(scales::margin);
+    widgets::end_window_with_margins(scales::margin / 3);
 
-    widgets::window_with_margins("###events_options", scales::option, scales::margin * 3);
+    widgets::window_with_margins("###events_options", scales::option * 2, scales::margin / 3);
 
     if (widgets::body_button("create"))
         go_to_tab(tab_t::_create_event);
 
-    ImGui::SameLine();
-
-    if (widgets::body_button("joined", false))
+    if (widgets::body_button("joined"))
         go_to_tab(tab_t::_joined_events);
 
-    widgets::end_window_with_margins(scales::margin);
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::events::event_info() noexcept

@@ -44,7 +44,6 @@ namespace menu
         inline float global_alpha = 255.f;
         inline float off_alpha    = 90.f;
 
-
         inline float global_red   = 255.f;
         inline float global_green = 255.f;
         inline float global_blue  = 255.f;
@@ -67,17 +66,18 @@ namespace menu
 
     namespace widgets
     {
-        void head_text(const std::string& text, bool disabled = false, bool centered = true)                                                                    noexcept;
-        void body_text(const std::string& text, bool disabled = false, bool centered = true)                                                                    noexcept;
-        void foot_text(const std::string& text, bool disabled = false, bool centered = true)                                                                    noexcept;
+        void head_text(const std::string& text, bool disabled = false, bool centered = true)                                         noexcept;
+        void body_text(const std::string& text, bool disabled = false, bool centered = true)                                         noexcept;
+        void foot_text(const std::string& text, bool disabled = false, bool centered = true)                                         noexcept;
 
-        //TODO: void head_wrapped_text
+        void body_wrapped_text(const std::string& text, ImVec2 pos, int boundary_width)                                              noexcept;
 
-        bool head_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
-        bool body_button(const std::string& text, bool centered = true)                                                                                                                  noexcept;
-        bool input(char* text, std::size_t text_size, const std::string& hint, ImGuiInputTextFlags iflags = 0, bool centered = true)                                                     noexcept;
-        const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true)                                                            noexcept;
-        void upper_title(const std::string& text)                                                                                                                                        noexcept;
+        bool head_button(const std::string& text, bool centered = true)                                                              noexcept;
+        bool body_button(const std::string& text, bool centered = true)                                                              noexcept;
+        bool foot_button(const std::string& text, bool centered = true)                                                              noexcept;
+        bool input(char* text, std::size_t text_size, const std::string& hint, ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
+        const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true)        noexcept;
+        void upper_title(const std::string& text)                                                                                    noexcept;
 
         void logo()                                                                                                                                                                      noexcept;
 
@@ -93,7 +93,7 @@ namespace menu
         inline float input  = 190.f;
         inline float combo  = 160.f;
         inline float scale  = 140.f;
-        inline float event  = 300.f;
+        inline float event  = 370.f;
         inline int   round  = 50;
         inline int   border = 0;
         inline float margin = 50.f;
@@ -145,6 +145,8 @@ namespace menu
                 {
                     void            events() noexcept;
                     void        event_info() noexcept;
+
+
 
                     namespace members
                     {

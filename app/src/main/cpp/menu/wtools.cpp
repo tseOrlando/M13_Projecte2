@@ -32,7 +32,7 @@ void wtools::text(ImFont* font, const std::string& text, bool disabled, bool cen
  *
  * PD: This ain't mine, it's from : 'https://github.com/ocornut/imgui/issues/4465'
  * I just took out some external functions and added them as lambdas
- */ //TODO: IMPLEMENT WITH FONT
+ */
 void wtools::wrapped_text(ImFont* font, std::string text, ImVec2 position, int boundary_width, int lines, int y_padding) noexcept
 {
     auto str_to_vec = [](std::string str, std::string token)
@@ -66,7 +66,10 @@ void wtools::wrapped_text(ImFont* font, std::string text, ImVec2 position, int b
         ImGui::RenderText(render_pos, text.c_str(), 0, false);
     };
 
+    ImGui::PushFont(font);
     ImVec2 char_size = ImGui::CalcTextSize("X");
+    ImGui::PopFont();
+
     std::vector<std::string> words = str_to_vec(text, " ");
 
     int line_cnt = 0; // 0 is first line
@@ -229,4 +232,14 @@ const char* wtools::combo(ImFont* font, const char *label, const char* preview_v
     ImGui::Dummy(ImVec2(0, margin / 4));
 
     return selected_item;
+}
+
+/*
+ * Tries to make the user curiosity by cropping the text in half and adding 3 dots
+ */
+std::string wtools::get_curiosity_text(const std::string &text) noexcept
+{
+    size_t text_size = text.length();
+
+    return (text_size > 25 ? text.substr(0, static_cast<int>(text_size / 2)) + "..." : text);
 }
