@@ -5,9 +5,6 @@
 #include "../menu/headers/menu.h"
 #include "headers/memory_images/hard_motion_logo.h"
 
-#include "entities/event_t.h"
-#include "entities/member_t.h"
-
 /*
  * TODO: Call core::go_back directly and remove retarded core::change_tab flag
  * TODO: Fix the resume of android phone stuff to save state
@@ -178,9 +175,11 @@ bool menu::widgets::window_surface_info(const std::string &label, const std::str
 
     ImGui::PopStyleColor();
 
-    widgets::foot_text(label);
+    wtools::align();
+    widgets::foot_text(label, false, false);
 
-    widgets::foot_text(wtools::get_curiosity_text(info), true);
+    wtools::align();
+    widgets::foot_text(wtools::get_curiosity_text(info), true, false);
 
     if (widgets::foot_button("info"))
         post_call_func(label, info);
@@ -401,7 +400,7 @@ void menu::core::lobby::main::events::events() noexcept
     {
         auto data = [](const std::string& title, const std::string& content)
         {
-
+            go_to_tab(tab_t::_event_info);
         };
 
         std::string event = "event nº " + std::to_string(i);

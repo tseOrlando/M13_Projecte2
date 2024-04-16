@@ -7,6 +7,7 @@
 #include "fonts/manrope.h"
 #include "icons/icon_data.h"
 #include "icons/icons.h"
+#include "main/cpp/menu/entities/event_t.h"
 
 #ifndef HARD_MOTION_MENU_H
 #define HARD_MOTION_MENU_H
@@ -26,6 +27,8 @@ namespace menu
     {
         inline std::vector<const char *> dances = {"jumpstyle", "gabber/hakken", "shuffle" };
         inline char search[32] = {};
+
+        inline std::vector<event_t> events;
 
         namespace user_data
         {
@@ -145,8 +148,6 @@ namespace menu
                 {
                     void            events() noexcept;
                     void        event_info() noexcept;
-
-
 
                     namespace members
                     {

@@ -23,6 +23,7 @@ namespace wtools
     void image(const unsigned char* data, size_t data_size, ImVec2 size, bool centered)                                             noexcept;
 
     std::string get_curiosity_text(const std::string& text)                                                                         noexcept;
+    void align()                                                                                                                    noexcept;
 }
 
 /* OLD

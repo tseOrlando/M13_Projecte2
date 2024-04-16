@@ -2,6 +2,9 @@
 // Created by sel on 15/04/2024.
 //
 
+#ifndef HARD_MOTION_MEMBER_H
+#define HARD_MOTION_MEMBER_H
+
 class member_t
 {
 public:
@@ -19,3 +22,5 @@ private:
     std::string name;
     std::string number;
 };
+
+#endif //HARD_MOTION_EVENT_H

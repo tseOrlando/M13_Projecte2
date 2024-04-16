@@ -241,5 +241,11 @@ std::string wtools::get_curiosity_text(const std::string &text) noexcept
 {
     size_t text_size = text.length();
 
-    return (text_size > 25 ? text.substr(0, static_cast<int>(text_size / 2)) + "..." : text);
+    return (text_size > 30 ? text.substr(0, static_cast<int>(text_size / 2)) + "..." : text);
 }
+/*
+ * This function just aligns to the margin the menu has as a global
+ * value so it's hardcoded, just to get the control of what the function
+ * can do and add more features to this as well if needed
+ */
+void wtools::align() noexcept { ImGui::SetCursorPosX(ImGui::GetCursorPosX() + menu::scales::margin); }
