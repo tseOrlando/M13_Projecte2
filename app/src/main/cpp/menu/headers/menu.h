@@ -69,11 +69,9 @@ namespace menu
 
     namespace widgets
     {
-        void head_text(const std::string& text, bool disabled = false, bool centered = true)                                         noexcept;
-        void body_text(const std::string& text, bool disabled = false, bool centered = true)                                         noexcept;
-        void foot_text(const std::string& text, bool disabled = false, bool centered = true)                                         noexcept;
-
-        void body_wrapped_text(const std::string& text, ImVec2 pos, int boundary_width)                                              noexcept;
+        void head_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true)                                         noexcept;
+        void body_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true)                                         noexcept;
+        void foot_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true)                                         noexcept;
 
         bool head_button(const std::string& text, bool centered = true)                                                              noexcept;
         bool body_button(const std::string& text, bool centered = true)                                                              noexcept;
@@ -87,7 +85,9 @@ namespace menu
         bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
         void end_window_with_margins(float vertical_margin = 0.f)                                                                                                                        noexcept;
 
-        bool window_surface_info(const std::string &label, const std::string& info, std::function<void(const std::string& title, const std::string& content)> post_call_func, float vertical_length = 0.f, float vertical_margin = 0.f)                                                                     noexcept;
+        bool window_surface_info(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f)                                                                     noexcept;
+        bool event(const std::string &label, const std::string& info, std::function<void(const std::string& title, const std::string& content)> post_call_func = nullptr, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
+        void bulk(float more = 0)                                                                                                                                                                                                                 noexcept;
     }
 
     namespace scales
@@ -99,7 +99,10 @@ namespace menu
         inline float event  = 370.f;
         inline int   round  = 50;
         inline int   border = 0;
+
         inline float margin = 50.f;
+        inline float slight_space_between_widgets = margin / 5;
+        inline float event_margin = margin / 3;
     }
 
     namespace core

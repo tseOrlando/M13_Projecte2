@@ -15,7 +15,7 @@
  */
 namespace wtools
 {
-    void text(ImFont* font, const std::string& text, bool disabled, bool centered)                                                  noexcept;
+    void text(ImFont* font, const std::string& text, bool multi_line, bool disabled, bool centered)                                                  noexcept;
     void wrapped_text(ImFont* font, std::string text, ImVec2 position, int boundary_width, int lines = 3, int y_padding = 3)        noexcept;
     bool button(ImFont* font, const std::string& text, bool centered)                                                               noexcept;
     bool input(ImFont* font, char* text, std::size_t text_size,  const std::string& hint, ImGuiInputTextFlags flags, bool centered) noexcept;

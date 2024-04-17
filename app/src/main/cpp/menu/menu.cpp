@@ -82,9 +82,9 @@ void menu::load_style() noexcept
 /*
  * Memory based head and body fonts wrapped in 1 function in order to operate fast
  */
-void menu::widgets::head_text(const std::string& text, bool disabled, bool centered) noexcept { wtools::text(font::head, text, disabled, centered); }
-void menu::widgets::body_text(const std::string& text, bool disabled, bool centered) noexcept { wtools::text(font::body, text, disabled, centered); }
-void menu::widgets::foot_text(const std::string& text, bool disabled, bool centered) noexcept { wtools::text(font::foot, text, disabled, centered); }
+void menu::widgets::head_text(const std::string& text, bool multi_line, bool disabled, bool centered) noexcept { wtools::text(font::head, text, multi_line, disabled, centered); }
+void menu::widgets::body_text(const std::string& text, bool multi_line, bool disabled, bool centered) noexcept { wtools::text(font::body, text, multi_line, disabled, centered); }
+void menu::widgets::foot_text(const std::string& text, bool multi_line, bool disabled, bool centered) noexcept { wtools::text(font::foot, text, multi_line, disabled, centered); }
 
 /*
  * Buttons wrapped in their different fonts in order to use them without the problem
@@ -166,8 +166,9 @@ void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
  * that will be called when clicked the info button inside of it, you will need
  * to make a lambda function outside of this function call in order to add it on
  * the parameters
+ *
  */
-bool menu::widgets::window_surface_info(const std::string &label, const std::string& info, std::function<void(const std::string& title, const std::string& content)> post_call_func, float vertical_length, float vertical_margin) noexcept
+bool menu::widgets::window_surface_info(const std::string &label, float vertical_length, float vertical_margin) noexcept
 {
     ImGui::PushStyleColor(ImGuiCol_ChildBg, colors::widgets);
 
@@ -175,11 +176,18 @@ bool menu::widgets::window_surface_info(const std::string &label, const std::str
 
     ImGui::PopStyleColor();
 
-    wtools::align();
-    widgets::foot_text(label, false, false);
+    return used;
+}
+
+bool menu::widgets::event(const std::string &label, const std::string &info, std::function<void(const std::string &, const std::string &)> post_call_func, float vertical_length, float vertical_margin) noexcept
+{
+    bool used = window_surface_info(label, vertical_length, vertical_margin);
 
     wtools::align();
-    widgets::foot_text(wtools::get_curiosity_text(info), true, false);
+    widgets::foot_text(label, false, false, false);
+
+    wtools::align();
+    widgets::foot_text(wtools::get_curiosity_text(info), false, true, false);
 
     if (widgets::foot_button("info"))
         post_call_func(label, info);
@@ -189,9 +197,9 @@ bool menu::widgets::window_surface_info(const std::string &label, const std::str
     return used;
 }
 /*
- * Automatically centered wrapped text (Multi-Line Text) from ImGui
+ * Used for those functions that doesn't have any default margin
  */
-void menu::widgets::body_wrapped_text(const std::string &text, ImVec2 pos, int boundary_width) noexcept { wtools::wrapped_text(font::body, text, pos, boundary_width); }
+void menu::widgets::bulk(float more) noexcept { ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, scales::margin * more)); }
 
 /*
  * This function will update the tabs visually.
@@ -387,11 +395,14 @@ void menu::core::lobby::main::events::events() noexcept
 
     widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
 
+    /*
+     * when real data applied, ill do the fking searcher
+     */
     widgets::input(values::search, sizeof values::search, "event..");
 
-    widgets::end_window_with_margins(scales::margin / 5);
+    widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
-    widgets::window_with_margins("###events", scales::option * 4, scales::margin / 5, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+    widgets::window_with_margins("###events", scales::option * 4, scales::slight_space_between_widgets, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
     /*
      * sample data
@@ -403,15 +414,15 @@ void menu::core::lobby::main::events::events() noexcept
             go_to_tab(tab_t::_event_info);
         };
 
-        std::string event = "event nº " + std::to_string(i);
-        std::string info  = "event info text " + std::to_string(i) + "data aaaa dataaa";
+        std::string event_title = "event nº " + std::to_string(i);
+        std::string info  = "event info text lorem Gpssshdjhdhf" + std::to_string(i) + "data aaaa dataaa";
 
-        widgets::window_surface_info(event, info, data, scales::event, scales::margin / 3);
+        widgets::event(event_title, info, data, scales::event, scales::event_margin);
     }
 
-    widgets::end_window_with_margins(scales::margin / 3);
+    widgets::end_window_with_margins(scales::event_margin);
 
-    widgets::window_with_margins("###events_options", scales::option * 2, scales::margin / 3);
+    widgets::window_with_margins("###events_options", scales::option * 2, scales::event_margin);
 
     if (widgets::body_button("create"))
         go_to_tab(tab_t::_create_event);
@@ -425,6 +436,24 @@ void menu::core::lobby::main::events::events() noexcept
 void menu::core::lobby::main::events::event_info() noexcept
 {
     widgets::upper_title("event info");
+
+    widgets::bulk(3);
+
+    widgets::body_text("event title");
+
+    widgets::bulk();
+
+    widgets::window_with_margins("###event_info_with_description", scales::option + (scales::event * 2), scales::slight_space_between_widgets);
+
+    ImGui::CalcTextSize()
+
+    widgets::window_surface_info("###event_info", scales::event * 3, scales::event_margin);
+
+    wtools::align();
+    widgets::foot_text("txt", true, false, false);
+    widgets::end_window_with_margins();
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::events::members::event_members() noexcept
