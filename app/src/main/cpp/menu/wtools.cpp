@@ -17,10 +17,11 @@
  */
 void wtools::text(ImFont* font, const std::string& text, bool multi_line, bool disabled, bool centered) noexcept
 {
+
+    ImGui::PushFont(font);
     if (centered)
         ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(text.c_str()).x) * 0.5f);
 
-    ImGui::PushFont(font);
     if (!disabled && !multi_line) ImGui::Text("%s", text.c_str());
     else if (!multi_line) ImGui::TextDisabled("%s", text.c_str());
     else ImGui::TextWrapped("%s", text.c_str());
@@ -108,6 +109,12 @@ bool wtools::input(ImFont *font, char* text, std::size_t text_size,  const std::
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + margin);
 
     ImGui::PushFont(font);
+
+
+    //TODO: IMPLEMENT A OPTION TO ADD ICON NEXT TO THE INPUT
+    ImGui::Text(ICON_FA_SQUARE);
+
+    ImGui::SameLine(114, -10);
 
     /*
      * Hint always different, label different

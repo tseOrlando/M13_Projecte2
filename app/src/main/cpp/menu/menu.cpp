@@ -141,14 +141,20 @@ void menu::widgets::logo() noexcept
  * calling this you're responsible of adding the correspondent EndChild to never get problems
  * and get nice margins B)
  */
-bool menu::widgets::window_with_margins(const std::string &label, float vertical_length, float vertical_margin, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) noexcept
+bool menu::widgets::window_with_margins(const std::string &label, float vertical_length, float vertical_margin, ImVec4 col, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) noexcept
 {
     if (vertical_margin != 0.f)
         ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, vertical_margin));
 
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + scales::margin);
 
-    return ImGui::BeginChild(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x - scales::margin, vertical_length), child_flags, window_flags);
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, col);
+
+    bool used = ImGui::BeginChild(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x - scales::margin, vertical_length), child_flags, window_flags);
+
+    ImGui::PopStyleColor();
+
+    return used;
 }
 /*
  * Custom 'ImGui::EndChild()' to add a margin at the end!
@@ -161,33 +167,13 @@ void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
         ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, vertical_margin));
 }
 
-/*
- * This function is used to display event data, the void func is the function
- * that will be called when clicked the info button inside of it, you will need
- * to make a lambda function outside of this function call in order to add it on
- * the parameters
- *
- */
-bool menu::widgets::window_surface_info(const std::string &label, float vertical_length, float vertical_margin) noexcept
-{
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, colors::widgets);
-
-    bool used = window_with_margins("###" + label, vertical_length, vertical_margin / 2, ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar);
-
-    ImGui::PopStyleColor();
-
-    return used;
-}
-
 bool menu::widgets::event(const std::string &label, const std::string &info, std::function<void(const std::string &, const std::string &)> post_call_func, float vertical_length, float vertical_margin) noexcept
 {
-    bool used = window_surface_info(label, vertical_length, vertical_margin);
+    bool used = window_with_margins(label, vertical_length, vertical_margin, colors::widgets);
 
-    wtools::align();
-    widgets::foot_text(label, false, false, false);
+    foot_text(label, false, false);
 
-    wtools::align();
-    widgets::foot_text(wtools::get_curiosity_text(info), false, true, false);
+    foot_text(wtools::get_curiosity_text(info), false, true);
 
     if (widgets::foot_button("info"))
         post_call_func(label, info);
@@ -402,7 +388,7 @@ void menu::core::lobby::main::events::events() noexcept
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
-    widgets::window_with_margins("###events", scales::option * 4, scales::slight_space_between_widgets, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+    widgets::window_with_margins("###events", scales::option * 4, scales::slight_space_between_widgets, colors::child, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
     /*
      * sample data
@@ -437,21 +423,28 @@ void menu::core::lobby::main::events::event_info() noexcept
 {
     widgets::upper_title("event info");
 
-    widgets::bulk(3);
+    float body_size_y_with_pad = values::get_font_size(font::body).y + 10.f;
+
+    widgets::window_with_margins("###event_title", body_size_y_with_pad, scales::margin * 3);
 
     widgets::body_text("event title");
 
-    widgets::bulk();
+    widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
     widgets::window_with_margins("###event_info_with_description", scales::option + (scales::event * 2), scales::slight_space_between_widgets);
 
-    ImGui::CalcTextSize()
-
-    widgets::window_surface_info("###event_info", scales::event * 3, scales::event_margin);
-
     wtools::align();
-    widgets::foot_text("txt", true, false, false);
-    widgets::end_window_with_margins();
+    widgets::foot_text("Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas \"Letraset\", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.", true, false, false);
+
+    widgets::end_window_with_margins(scales::margin * 3);
+
+    widgets::window_with_margins("###members", scales::option);
+
+    if (widgets::body_button("members"))
+    {
+        //procedure
+        go_to_tab(tab_t::_event_members);
+    }
 
     widgets::end_window_with_margins();
 }
@@ -459,11 +452,33 @@ void menu::core::lobby::main::events::event_info() noexcept
 void menu::core::lobby::main::events::members::event_members() noexcept
 {
     widgets::upper_title("members");
+
+    widgets::window_with_margins("###members_names", scales::option * 7, scales::margin * 3);
+
+    for (int i = 0; i <= 20; ++i)
+    {
+        if (widgets::body_button("member nº " + std::to_string(i)))
+        {
+            //procedure
+            go_to_tab(tab_t::_member_info);
+        }
+    }
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::events::members::member_info() noexcept
 {
     widgets::upper_title("member info");
+
+    widgets::window_with_margins("###member_info",  scales::input * 2, scales::margin * 3);
+
+    ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+    widgets::input("member name", strlen("member name"), "", ImGuiInputTextFlags_ReadOnly);
+    widgets::input("623475587", strlen("623475587"), "", ImGuiInputTextFlags_ReadOnly);
+    ImGui::PopItemFlag();
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::events::create_event() noexcept
@@ -499,4 +514,13 @@ void menu::core::lobby::main::user::edit_user_info() noexcept
 void menu::core::lobby::main::user::admin_panel() noexcept
 {
     widgets::upper_title("admin panel");
+}
+
+ImVec2 menu::values::get_font_size(ImFont *font) noexcept
+{
+    ImGui::PushFont(font);
+    ImVec2 size = ImGui::CalcTextSize("X");
+    ImGui::PopFont();
+
+    return size;
 }

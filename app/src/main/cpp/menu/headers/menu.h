@@ -30,6 +30,8 @@ namespace menu
 
         inline std::vector<event_t> events;
 
+        inline ImVec2 get_font_size(ImFont* font) noexcept;
+
         namespace user_data
         {
             inline char user_name[16] = {};
@@ -82,10 +84,9 @@ namespace menu
 
         void logo()                                                                                                                                                                      noexcept;
 
-        bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
+        bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImVec4 col = colors::child, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
         void end_window_with_margins(float vertical_margin = 0.f)                                                                                                                        noexcept;
 
-        bool window_surface_info(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f)                                                                     noexcept;
         bool event(const std::string &label, const std::string& info, std::function<void(const std::string& title, const std::string& content)> post_call_func = nullptr, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
         void bulk(float more = 0)                                                                                                                                                                                                                 noexcept;
     }
