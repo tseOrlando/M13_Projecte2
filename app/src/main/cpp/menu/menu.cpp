@@ -95,9 +95,11 @@ bool menu::widgets::body_button(const std::string &text, bool centered) noexcept
 bool menu::widgets::foot_button(const std::string &text, bool centered) noexcept { return wtools::button(font::foot, text, centered); }
 
 /*
- * Input text with 'font::foot' by default because I really doubt it will be used with 'font::head' or 'font::body' lol
+ * Input text with 'font::body' by default because I really doubt it will be used with 'font::head' or 'font::foot' lol
+ * PD: I really needed one now
  */
-bool menu::widgets::input(char* text, std::size_t text_size, const std::string &hint, ImGuiInputTextFlags iflags, bool centered) noexcept { return wtools::input(font::body, text, text_size, hint, iflags, centered); }
+bool menu::widgets::input(char* text, std::size_t text_size, const std::string &hint, bool multi_line, const std::string& icon, ImGuiInputTextFlags iflags, bool centered) noexcept { return wtools::input(font::body, text, text_size, hint, multi_line, icon, iflags, centered); }
+bool menu::widgets::input_foot(char* text, std::size_t text_size, const std::string &hint, bool multi_line, const std::string& icon, ImGuiInputTextFlags iflags, bool centered) noexcept { return wtools::input(font::foot, text, text_size, hint, multi_line, icon, iflags, centered); }
 
 /*
  * Wrapped combo to be used, nothing else to comment to this
@@ -309,7 +311,7 @@ void menu::core::lobby::auth::log_in() noexcept
     widgets::window_with_margins("###log_in_panel", scales::input * 2, scales::margin * 10);
 
     widgets::input(values::user_data::user_name, sizeof values::user_data::user_name, "username..");
-    widgets::input(values::user_data::pass_word, sizeof values::user_data::pass_word, "password..", ImGuiInputTextFlags_Password);
+    widgets::input(values::user_data::pass_word, sizeof values::user_data::pass_word, "password..", false, "", ImGuiInputTextFlags_Password);
 
     widgets::end_window_with_margins(scales::margin * 9);
 
@@ -334,7 +336,7 @@ void menu::core::lobby::auth::register_in() noexcept
     widgets::window_with_margins("###register_in_panel", (scales::input * 4) + scales::combo, scales::margin * 4);
 
     widgets::input(values::user_data::user_name, sizeof values::user_data::user_name, "username..");
-    widgets::input(values::user_data::pass_word, sizeof values::user_data::pass_word, "password..", ImGuiInputTextFlags_Password);
+    widgets::input(values::user_data::pass_word, sizeof values::user_data::pass_word, "password..", false, "", ImGuiInputTextFlags_Password);
     widgets::input(values::user_data::e_mail, sizeof values::user_data::e_mail, "e-mail..");
     widgets::input(values::user_data::number, sizeof values::user_data::number, "number..");
 
@@ -377,6 +379,8 @@ void menu::core::lobby::main::hub() noexcept
 
 void menu::core::lobby::main::events::events() noexcept
 {
+    char search_event[32] = {};
+
     widgets::upper_title("events");
 
     widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
@@ -384,7 +388,7 @@ void menu::core::lobby::main::events::events() noexcept
     /*
      * when real data applied, ill do the fking searcher
      */
-    widgets::input(values::search, sizeof values::search, "event..");
+    widgets::input(search_event, sizeof search_event, "event..", false, ICON_FA_SEARCH);
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
@@ -451,9 +455,17 @@ void menu::core::lobby::main::events::event_info() noexcept
 
 void menu::core::lobby::main::events::members::event_members() noexcept
 {
+    char search_member[32] = {};
     widgets::upper_title("members");
 
-    widgets::window_with_margins("###members_names", scales::option * 7, scales::margin * 3);
+    /*
+     * TODO OPTIONAL: if user list count less than 6 don't add the search bar
+     */
+    widgets::window_with_margins("###members_search", scales::input, scales::margin * 3);
+    widgets::input(search_member, sizeof search_member, "member..", ICON_FA_SEARCH);
+    widgets::end_window_with_margins();
+
+    widgets::window_with_margins("###members_names", scales::option * 6, scales::slight_space_between_widgets);
 
     for (int i = 0; i <= 20; ++i)
     {
@@ -472,10 +484,12 @@ void menu::core::lobby::main::events::members::member_info() noexcept
     widgets::upper_title("member info");
 
     widgets::window_with_margins("###member_info",  scales::input * 2, scales::margin * 3);
-
+    /*
+     * Recycle
+     */
     ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-    widgets::input("member name", strlen("member name"), "", ImGuiInputTextFlags_ReadOnly);
-    widgets::input("623475587", strlen("623475587"), "", ImGuiInputTextFlags_ReadOnly);
+    widgets::input("member name", strlen("member name"), "", false, "", ImGuiInputTextFlags_ReadOnly);
+    widgets::input("623475587", strlen("623475587"), "", false, ICON_FA_PHONE, ImGuiInputTextFlags_ReadOnly);
     ImGui::PopItemFlag();
 
     widgets::end_window_with_margins();
@@ -483,12 +497,64 @@ void menu::core::lobby::main::events::members::member_info() noexcept
 
 void menu::core::lobby::main::events::create_event() noexcept
 {
+    char event_title[32]  = {};
+    char event_info[255]  = {};
+
+    float default_scale = scales::margin * 3;
+
     widgets::upper_title("create event");
+
+    widgets::window_with_margins("###create_event", scales::input + (scales::input * 4.13), default_scale);
+
+    widgets::input(event_title, sizeof event_title, "event title..");
+    widgets::input_foot(event_info, sizeof event_info, "", true); //Multiline doesn't support hint
+
+    widgets::end_window_with_margins(scales::margin * 5);
+
+    widgets::window_with_margins("###upload", scales::option);
+
+    if (widgets::body_button("upload"))
+    {
+        //:.:
+    }
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::events::joined_events() noexcept
 {
-    widgets::upper_title("joined events");
+    char search_joined_event[32] = {};
+
+    widgets::upper_title("events");
+
+    widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
+
+    /*
+     * when real data applied, ill do the fking searcher
+     */
+    widgets::input(search_joined_event, sizeof search_joined_event, "event..", false, ICON_FA_SEARCH);
+
+    widgets::end_window_with_margins(scales::slight_space_between_widgets);
+
+    widgets::window_with_margins("###joined_events", scales::option * 6, 0.f, colors::child, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+    /*
+     * sample data
+     */
+    for (int i = 0; i <= 10; i++)
+    {
+        auto data = [](const std::string& title, const std::string& content)
+        {
+            go_to_tab(tab_t::_event_info);
+        };
+
+        std::string event_title = "event nº " + std::to_string(i);
+        std::string info  = "event info text lorem Gpssshdjhdhf" + std::to_string(i) + "data aaaa dataaa";
+
+        widgets::event(event_title, info, data, scales::event, scales::event_margin);
+    }
+
+    widgets::end_window_with_margins(scales::event_margin);
 }
 
 void menu::core::lobby::main::search::search() noexcept

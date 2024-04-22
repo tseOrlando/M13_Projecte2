@@ -97,7 +97,7 @@ void wtools::image(const unsigned char* data, size_t data_size, ImVec2 size, boo
  * - Change the font
  * - Center it
  */
-bool wtools::input(ImFont *font, char* text, std::size_t text_size,  const std::string &hint, ImGuiInputTextFlags flags, bool centered) noexcept
+bool wtools::input(ImFont *font, char* text, std::size_t text_size,  const std::string &hint, bool multi_line, const std::string& icon, ImGuiInputTextFlags flags, bool centered) noexcept
 {
     bool used = false;
 
@@ -110,17 +110,20 @@ bool wtools::input(ImFont *font, char* text, std::size_t text_size,  const std::
 
     ImGui::PushFont(font);
 
-
-    //TODO: IMPLEMENT A OPTION TO ADD ICON NEXT TO THE INPUT
-    ImGui::Text(ICON_FA_SQUARE);
-
-    ImGui::SameLine(114, -10);
+    if (icon != "") //xd
+    {
+        ImGui::Text("%s", icon.c_str());
+        ImGui::SameLine(114, -10);
+    }
 
     /*
      * Hint always different, label different
      */
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - margin);
-    used = ImGui::InputTextWithHint(std::string("###" + hint).c_str(), hint.c_str(), text, text_size, flags);
+
+    if (!multi_line)
+        used = ImGui::InputTextWithHint(std::string("###" + hint).c_str(), hint.c_str(), text, text_size, flags);
+    else used = ImGui::InputTextMultiline(std::string("###" + hint).c_str(), text, text_size);
     ImGui::PopItemWidth();
 
     ImGui::PopFont();

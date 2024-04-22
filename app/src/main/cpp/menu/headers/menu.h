@@ -26,7 +26,6 @@ namespace menu
     namespace values
     {
         inline std::vector<const char *> dances = {"jumpstyle", "gabber/hakken", "shuffle" };
-        inline char search[32] = {};
 
         inline std::vector<event_t> events;
 
@@ -78,7 +77,8 @@ namespace menu
         bool head_button(const std::string& text, bool centered = true)                                                              noexcept;
         bool body_button(const std::string& text, bool centered = true)                                                              noexcept;
         bool foot_button(const std::string& text, bool centered = true)                                                              noexcept;
-        bool input(char* text, std::size_t text_size, const std::string& hint, ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
+        bool input(char* text, std::size_t text_size, const std::string& hint, bool multi_line = false, const std::string& icon = "", ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
+        bool input_foot(char* text, std::size_t text_size, const std::string& hint, bool multi_line = false, const std::string& icon = "", ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
         const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true)        noexcept;
         void upper_title(const std::string& text)                                                                                    noexcept;
 
