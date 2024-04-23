@@ -169,21 +169,53 @@ void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
         ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, vertical_margin));
 }
 
-bool menu::widgets::event(const std::string &label, const std::string &info, std::function<void(const std::string &, const std::string &)> post_call_func, float vertical_length, float vertical_margin) noexcept
+bool menu::widgets::event(const event_t event, float vertical_length, float vertical_margin) noexcept
 {
-    bool used = window_with_margins(label, vertical_length, vertical_margin, colors::widgets);
+    std::string event_name = event.get_name();
 
-    foot_text(label, false, false);
+    bool used = window_with_margins(event_name, vertical_length, vertical_margin, colors::widgets);
 
-    foot_text(wtools::get_curiosity_text(info), false, true);
+    foot_text(event_name, false, false);
+
+    foot_text(wtools::get_curiosity_text(event.get_info()), false, true);
 
     if (widgets::foot_button("info"))
-        post_call_func(label, info);
 
     end_window_with_margins(vertical_margin);
 
     return used;
 }
+
+/*
+ *
+ * User searched on the user searcher
+ */
+bool menu::widgets::user(member_t member, float vertical_length, float vertical_margin) noexcept
+{
+    std::string name = member.get_name();
+
+    bool used = window_with_margins(name, vertical_length, vertical_margin, colors::widgets);
+
+    foot_text(name, false, false);
+
+    foot_text(member.dance_type_str(), false, true);
+
+    if (widgets::foot_button("info"))
+        ImGui::OpenPopup("###user_number");
+
+    if (ImGui::BeginPopup("###user_number"))
+    {
+        widgets::foot_text(member.get_name() +"'s " + member.get_number());
+
+        ImGui::EndPopup();
+    }
+
+    end_window_with_margins(vertical_margin);
+
+    return used;
+}
+
+
 /*
  * Used for those functions that doesn't have any default margin
  */
@@ -399,15 +431,7 @@ void menu::core::lobby::main::events::events() noexcept
      */
     for (int i = 0; i <= 10; i++)
     {
-        auto data = [](const std::string& title, const std::string& content)
-        {
-            go_to_tab(tab_t::_event_info);
-        };
-
-        std::string event_title = "event nº " + std::to_string(i);
-        std::string info  = "event info text lorem Gpssshdjhdhf" + std::to_string(i) + "data aaaa dataaa";
-
-        widgets::event(event_title, info, data, scales::event, scales::event_margin);
+        widgets::event(event_t() scales::event, scales::event_margin);
     }
 
     widgets::end_window_with_margins(scales::event_margin);
@@ -462,7 +486,7 @@ void menu::core::lobby::main::events::members::event_members() noexcept
      * TODO OPTIONAL: if user list count less than 6 don't add the search bar
      */
     widgets::window_with_margins("###members_search", scales::input, scales::margin * 3);
-    widgets::input(search_member, sizeof search_member, "member..", ICON_FA_SEARCH);
+    widgets::input(search_member, sizeof search_member, "member..", false,ICON_FA_SEARCH);
     widgets::end_window_with_margins();
 
     widgets::window_with_margins("###members_names", scales::option * 6, scales::slight_space_between_widgets);
@@ -560,6 +584,40 @@ void menu::core::lobby::main::events::joined_events() noexcept
 void menu::core::lobby::main::search::search() noexcept
 {
     widgets::upper_title("search");
+
+    char search_user[32] = {};
+
+    widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
+
+    /*
+     * when real data applied, ill do the fking searcher
+     */
+    widgets::input(search_user, sizeof search_user, "user..", false, ICON_FA_SEARCH);
+
+    widgets::end_window_with_margins(scales::slight_space_between_widgets);
+
+    widgets::window_with_margins("###users", scales::option * 4, scales::slight_space_between_widgets, colors::child, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+    /*
+     * sample data
+     */
+    for (int i = 0; i <= 20; ++i)
+    {
+        if (widgets::body_button("user nº " + std::to_string(i)))
+        {
+            //procedure
+            go_to_tab(tab_t::_member_info);
+        }
+    }
+
+    widgets::end_window_with_margins(scales::event_margin);
+
+    widgets::window_with_margins("###events_options", scales::option, scales::event_margin);
+
+    if (widgets::body_button("filter"))
+        go_to_tab(tab_t::_filter);
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::search::filter() noexcept

@@ -10,6 +10,9 @@
 class event_t
 {
 public:
+    event_t(const std::string &name, const std::string &info, const std::vector<member_t> &members): name(name), info(info), members(members) {}
+    virtual ~event_t() {}
+
     const std::string &get_name() const              { return event_t::name; }
     const std::string &get_info() const              { return event_t::info; }
     const std::vector<member_t> &get_members() const { return event_t::members; }
@@ -17,6 +20,8 @@ public:
 private:
     std::string name;
     std::string info;
+
+private:
     std::vector<member_t> members;
 };
 

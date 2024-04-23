@@ -26,7 +26,7 @@ namespace menu
     namespace values
     {
         inline std::vector<const char *> dances = {"jumpstyle", "gabber/hakken", "shuffle" };
-
+        inline std::vector<bool> dance_filter = { false, false, false }; // jumpstyle - hakken/gabber - shuffle
         inline std::vector<event_t> events;
 
         inline ImVec2 get_font_size(ImFont* font) noexcept;
@@ -87,8 +87,9 @@ namespace menu
         bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImVec4 col = colors::child, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
         void end_window_with_margins(float vertical_margin = 0.f)                                                                                                                        noexcept;
 
-        bool event(const std::string &label, const std::string& info, std::function<void(const std::string& title, const std::string& content)> post_call_func = nullptr, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
-        void bulk(float more = 0)                                                                                                                                                                                                                 noexcept;
+        bool event(const event_t event, float vertical_length = 0.f, float vertical_margin = 0.f)   noexcept;
+        bool user(const member_t member, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;                                                                                                                                                                                                                 noexcept;
+        void bulk(float more = 0)                                                                                                                                                                                                     noexcept;
     }
 
     namespace scales
