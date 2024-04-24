@@ -123,13 +123,15 @@ namespace menu
             _events         = 4,
             _event_info     = 5,
             _event_members  = 6,
-            _create_event   = 7,
-            _joined_events  = 8,
-            _search         = 9,
-            _filter         = 10,
-            _user           = 11,
-            _edit_user_info = 12,
-            _admin_panel    = 13
+            _member_info    = 7,
+            _create_event   = 8,
+            _joined_events  = 9,
+            _search         = 10,
+            _user_info      = 11,
+            _filter         = 12,
+            _user           = 13,
+            _edit_user_info = 14,
+            _admin_panel    = 15
         };
 
         void go_to_tab(tab_t tab) noexcept;
@@ -161,6 +163,7 @@ namespace menu
                     namespace members
                     {
                         void event_members() noexcept;
+                        void   member_info() noexcept;
                     }
 
                     void      create_event() noexcept;
@@ -170,6 +173,12 @@ namespace menu
                 namespace search
                 {
                     void            search() noexcept;
+
+                    namespace user
+                    {
+                        void     user_info() noexcept;
+                    }
+
                     void            filter() noexcept;
                 }
 

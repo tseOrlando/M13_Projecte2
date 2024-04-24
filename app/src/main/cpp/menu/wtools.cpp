@@ -17,7 +17,6 @@
  */
 void wtools::text(ImFont* font, const std::string& text, bool multi_line, bool disabled, bool centered) noexcept
 {
-
     ImGui::PushFont(font);
     if (centered)
         ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(text.c_str()).x) * 0.5f);

@@ -249,10 +249,12 @@ void menu::core::go_to_tab(tab_t tab) noexcept
         case _events:  lobby::main::events::events();                        break;
         case _event_info:  lobby::main::events::event_info();                break;
         case _event_members:  lobby::main::events::members::event_members(); break;
+        case _member_info:  lobby::main::events::members::member_info();     break;
         case _create_event:  lobby::main::events::create_event();            break;
         case _joined_events:  lobby::main::events::joined_events();          break;
 
         case _search: lobby::main::search::search();                         break;
+        case _user_info: lobby::main::search::user::user_info();             break;
         case _filter: lobby::main::search::filter();                         break;
 
         case _user: lobby::main::user::user();                               break;
@@ -492,17 +494,23 @@ void menu::core::lobby::main::events::members::event_members() noexcept
 
     for (int i = 0; i <= 20; ++i)
     {
-        ImGui::PushFont(font::foot);
-        if (widgets::foot_button("member nº " + std::to_string(i)))
-            ImGui::OpenPopup(std::string("###user_number_" + std::to_string(i)).c_str());
 
-        if (ImGui::BeginPopup(std::string("###user_number_" + std::to_string(i)).c_str()))
-        {
-            widgets::foot_text("6223323873"); // soon more functionality
-
-            ImGui::EndPopup();
-        }
     }
+
+    widgets::end_window_with_margins();
+}
+
+void menu::core::lobby::main::events::members::member_info() noexcept
+{
+    widgets::upper_title("member info");
+
+    widgets::window_with_margins(values::current_member.get_name(), scales::input * 2);
+
+    std::string name = values::current_member.get_name();
+    std::string number = values::current_member.get_number();
+
+    widgets::input(name, strlen(name.c_str()), "");
+    widgets::input(number, strlen(number.c_str()));
 
     widgets::end_window_with_margins();
 }
@@ -593,6 +601,12 @@ void menu::core::lobby::main::search::search() noexcept
         go_to_tab(tab_t::_filter);
 
     widgets::end_window_with_margins();
+}
+
+
+void menu::core::lobby::main::search::user::user_info() noexcept
+{
+
 }
 
 void menu::core::lobby::main::search::filter() noexcept
