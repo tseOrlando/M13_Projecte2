@@ -10,18 +10,19 @@
 class event_t
 {
 public:
-    event_t(const std::string &name, const std::string &info, const std::vector<member_t> &members): name(name), info(info), members(members) {}
+    event_t(const std::string &id, const std::string &name, const std::string &info, const std::vector<member_t> &members = {}): id(id), name(name), info(info), members(members) {}
+    event_t() {}
     virtual ~event_t() {}
 
+    const std::string &get_id()   const              { return event_t::id; }
     const std::string &get_name() const              { return event_t::name; }
     const std::string &get_info() const              { return event_t::info; }
     const std::vector<member_t> &get_members() const { return event_t::members; }
 
 private:
+    std::string id;
     std::string name;
     std::string info;
-
-private:
     std::vector<member_t> members;
 };
 

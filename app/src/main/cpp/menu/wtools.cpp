@@ -173,7 +173,7 @@ std::string wtools::get_curiosity_text(const std::string &text) noexcept
 {
     float text_size_x = ImGui::CalcTextSize(text.c_str()).x;
 
-    return (text_size_x > ImGui::GetWindowWidth() ? text.substr(0, static_cast<int>(text.length() / 2.2)) + "..." : text);
+    return (text_size_x > ImGui::GetContentRegionAvail().x ? text.substr(0, static_cast<int>(text.length() / 1.5)) + "..." : text);
 }
 /*
  * This function just aligns to the margin the menu has as a global

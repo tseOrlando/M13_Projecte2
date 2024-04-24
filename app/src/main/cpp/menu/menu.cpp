@@ -180,6 +180,9 @@ bool menu::widgets::event(const event_t event, float vertical_length, float vert
     foot_text(wtools::get_curiosity_text(event.get_info()), false, true);
 
     if (widgets::foot_button("info"))
+    {
+        core::go_to_tab(core::tab_t::_event_info);
+    }
 
     end_window_with_margins(vertical_margin);
 
@@ -246,7 +249,6 @@ void menu::core::go_to_tab(tab_t tab) noexcept
         case _events:  lobby::main::events::events();                        break;
         case _event_info:  lobby::main::events::event_info();                break;
         case _event_members:  lobby::main::events::members::event_members(); break;
-        case _member_info:  lobby::main::events::members::member_info();     break;
         case _create_event:  lobby::main::events::create_event();            break;
         case _joined_events:  lobby::main::events::joined_events();          break;
 
@@ -292,9 +294,6 @@ void menu::core::go_back() noexcept
             break;
         case _event_members:
             go_to_tab(_event_info);
-            break;
-        case _member_info:
-            go_to_tab(_event_members);
             break;
 
         case _create_event:
@@ -431,7 +430,7 @@ void menu::core::lobby::main::events::events() noexcept
      */
     for (int i = 0; i <= 10; i++)
     {
-        widgets::event(event_t() scales::event, scales::event_margin);
+        widgets::event(event_t(std::to_string(i), "event nº " + std::to_string(i), "event info papapapapapapapapap"), scales::event, scales::event_margin);
     }
 
     widgets::end_window_with_margins(scales::event_margin);
@@ -487,34 +486,23 @@ void menu::core::lobby::main::events::members::event_members() noexcept
      */
     widgets::window_with_margins("###members_search", scales::input, scales::margin * 3);
     widgets::input(search_member, sizeof search_member, "member..", false,ICON_FA_SEARCH);
-    widgets::end_window_with_margins();
+    widgets::end_window_with_margins(scales::event_margin);
 
     widgets::window_with_margins("###members_names", scales::option * 6, scales::slight_space_between_widgets);
 
     for (int i = 0; i <= 20; ++i)
     {
-        if (widgets::body_button("member nº " + std::to_string(i)))
+        ImGui::PushFont(font::foot);
+        if (widgets::foot_button("member nº " + std::to_string(i)))
+            ImGui::OpenPopup(std::string("###user_number_" + std::to_string(i)).c_str());
+
+        if (ImGui::BeginPopup(std::string("###user_number_" + std::to_string(i)).c_str()))
         {
-            //procedure
-            go_to_tab(tab_t::_member_info);
+            widgets::foot_text("6223323873"); // soon more functionality
+
+            ImGui::EndPopup();
         }
     }
-
-    widgets::end_window_with_margins();
-}
-
-void menu::core::lobby::main::events::members::member_info() noexcept
-{
-    widgets::upper_title("member info");
-
-    widgets::window_with_margins("###member_info",  scales::input * 2, scales::margin * 3);
-    /*
-     * Recycle
-     */
-    ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-    widgets::input("member name", strlen("member name"), "", false, "", ImGuiInputTextFlags_ReadOnly);
-    widgets::input("623475587", strlen("623475587"), "", false, ICON_FA_PHONE, ImGuiInputTextFlags_ReadOnly);
-    ImGui::PopItemFlag();
 
     widgets::end_window_with_margins();
 }
@@ -549,36 +537,28 @@ void menu::core::lobby::main::events::joined_events() noexcept
 {
     char search_joined_event[32] = {};
 
-    widgets::upper_title("events");
+    widgets::upper_title("joined events");
 
     widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
 
     /*
      * when real data applied, ill do the fking searcher
      */
-    widgets::input(search_joined_event, sizeof search_joined_event, "event..", false, ICON_FA_SEARCH);
+    widgets::input(search_joined_event, sizeof search_joined_event, " joined event..", false, ICON_FA_SEARCH);
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
-    widgets::window_with_margins("###joined_events", scales::option * 6, 0.f, colors::child, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+    widgets::window_with_margins("###joined_events", scales::option * 6, scales::slight_space_between_widgets, colors::child, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
     /*
      * sample data
      */
     for (int i = 0; i <= 10; i++)
     {
-        auto data = [](const std::string& title, const std::string& content)
-        {
-            go_to_tab(tab_t::_event_info);
-        };
-
-        std::string event_title = "event nº " + std::to_string(i);
-        std::string info  = "event info text lorem Gpssshdjhdhf" + std::to_string(i) + "data aaaa dataaa";
-
-        widgets::event(event_title, info, data, scales::event, scales::event_margin);
+        widgets::event(event_t(std::to_string(i), "event nº " + std::to_string(i), "event info kjraarjjrhjhrajharj"), scales::event, scales::event_margin);
     }
 
-    widgets::end_window_with_margins(scales::event_margin);
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::search::search() noexcept
@@ -603,11 +583,6 @@ void menu::core::lobby::main::search::search() noexcept
      */
     for (int i = 0; i <= 20; ++i)
     {
-        if (widgets::body_button("user nº " + std::to_string(i)))
-        {
-            //procedure
-            go_to_tab(tab_t::_member_info);
-        }
     }
 
     widgets::end_window_with_margins(scales::event_margin);

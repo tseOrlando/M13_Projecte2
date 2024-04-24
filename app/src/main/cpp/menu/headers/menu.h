@@ -27,7 +27,11 @@ namespace menu
     {
         inline std::vector<const char *> dances = {"jumpstyle", "gabber/hakken", "shuffle" };
         inline std::vector<bool> dance_filter = { false, false, false }; // jumpstyle - hakken/gabber - shuffle
+
         inline std::vector<event_t> events;
+        inline event_t current_event;
+        inline member_t current_member;
+
 
         inline ImVec2 get_font_size(ImFont* font) noexcept;
 
@@ -88,7 +92,7 @@ namespace menu
         void end_window_with_margins(float vertical_margin = 0.f)                                                                                                                        noexcept;
 
         bool event(const event_t event, float vertical_length = 0.f, float vertical_margin = 0.f)   noexcept;
-        bool user(const member_t member, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;                                                                                                                                                                                                                 noexcept;
+        bool user(const member_t member, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
         void bulk(float more = 0)                                                                                                                                                                                                     noexcept;
     }
 
@@ -99,12 +103,13 @@ namespace menu
         inline float combo  = 160.f;
         inline float scale  = 140.f;
         inline float event  = 370.f;
-        inline int   round  = 50;
-        inline int   border = 0;
+        inline int   round  = 50.f;
+        inline int   border = 0.f;
 
         inline float margin = 50.f;
-        inline float slight_space_between_widgets = margin / 5;
-        inline float event_margin = margin / 3;
+        inline float slight_space_between_widgets = margin / 5.f;
+        inline float event_margin = margin / 3.f;
+        inline float user_margin = event_margin;
     }
 
     namespace core
@@ -118,14 +123,13 @@ namespace menu
             _events         = 4,
             _event_info     = 5,
             _event_members  = 6,
-            _member_info    = 7,
-            _create_event   = 8,
-            _joined_events  = 9,
-            _search         = 10,
-            _filter         = 11,
-            _user           = 12,
-            _edit_user_info = 13,
-            _admin_panel    = 14
+            _create_event   = 7,
+            _joined_events  = 8,
+            _search         = 9,
+            _filter         = 10,
+            _user           = 11,
+            _edit_user_info = 12,
+            _admin_panel    = 13
         };
 
         void go_to_tab(tab_t tab) noexcept;
@@ -157,7 +161,6 @@ namespace menu
                     namespace members
                     {
                         void event_members() noexcept;
-                        void   member_info() noexcept;
                     }
 
                     void      create_event() noexcept;
