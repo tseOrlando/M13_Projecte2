@@ -204,14 +204,7 @@ bool menu::widgets::user(member_t member, float vertical_length, float vertical_
     foot_text(member.dance_type_str(), false, true);
 
     if (widgets::foot_button("info"))
-        ImGui::OpenPopup("###user_number");
-
-    if (ImGui::BeginPopup("###user_number"))
-    {
-        widgets::foot_text(member.get_name() +"'s " + member.get_number());
-
-        ImGui::EndPopup();
-    }
+        go_to_tab(core::tab_t::_user_info);
 
     end_window_with_margins(vertical_margin);
 
@@ -298,11 +291,16 @@ void menu::core::go_back() noexcept
             go_to_tab(_event_info);
             break;
 
+        case _member_info:
+            go_to_tab(_event_info);
+            break;
+
         case _create_event:
         case _joined_events:
             go_to_tab(_events);
             break;
 
+        case _user_info:
         case _filter:
             go_to_tab(_search);
             break;
@@ -416,7 +414,7 @@ void menu::core::lobby::main::events::events() noexcept
 
     widgets::upper_title("events");
 
-    widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
+    widgets::window_with_margins("###search_event", scales::input, scales::margin_before_title);
 
     /*
      * when real data applied, ill do the fking searcher
@@ -454,7 +452,7 @@ void menu::core::lobby::main::events::event_info() noexcept
 
     float body_size_y_with_pad = values::get_font_size(font::body).y + 10.f;
 
-    widgets::window_with_margins("###event_title", body_size_y_with_pad, scales::margin * 3);
+    widgets::window_with_margins("###event_title", body_size_y_with_pad, scales::margin_before_title);
 
     widgets::body_text("event title");
 
@@ -465,7 +463,7 @@ void menu::core::lobby::main::events::event_info() noexcept
     wtools::align();
     widgets::foot_text("Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas \"Letraset\", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.", true, false, false);
 
-    widgets::end_window_with_margins(scales::margin * 3);
+    widgets::end_window_with_margins(scales::margin_before_title);
 
     widgets::window_with_margins("###members", scales::option);
 
@@ -486,7 +484,7 @@ void menu::core::lobby::main::events::members::event_members() noexcept
     /*
      * TODO OPTIONAL: if user list count less than 6 don't add the search bar
      */
-    widgets::window_with_margins("###members_search", scales::input, scales::margin * 3);
+    widgets::window_with_margins("###members_search", scales::input, scales::margin_before_title);
     widgets::input(search_member, sizeof search_member, "member..", false,ICON_FA_SEARCH);
     widgets::end_window_with_margins(scales::event_margin);
 
@@ -494,7 +492,8 @@ void menu::core::lobby::main::events::members::event_members() noexcept
 
     for (int i = 0; i <= 20; ++i)
     {
-
+        if (widgets::foot_button("member nº" + std::to_string(i)))
+            go_to_tab(tab_t::_member_info);
     }
 
     widgets::end_window_with_margins();
@@ -504,13 +503,13 @@ void menu::core::lobby::main::events::members::member_info() noexcept
 {
     widgets::upper_title("member info");
 
-    widgets::window_with_margins(values::current_member.get_name(), scales::input * 2);
+    widgets::window_with_margins("###member_info", scales::input * 2, scales::margin_before_title);
 
     std::string name = values::current_member.get_name();
     std::string number = values::current_member.get_number();
 
-    widgets::input(name, strlen(name.c_str()), "");
-    widgets::input(number, strlen(number.c_str()));
+    widgets::input("member name", strlen("member name"), "");
+    widgets::input("6233749495", strlen("6233749495"), "", false, ICON_FA_PHONE);
 
     widgets::end_window_with_margins();
 }
@@ -520,7 +519,7 @@ void menu::core::lobby::main::events::create_event() noexcept
     char event_title[32]  = {};
     char event_info[255]  = {};
 
-    float default_scale = scales::margin * 3;
+    float default_scale = scales::margin_before_title;
 
     widgets::upper_title("create event");
 
@@ -547,7 +546,7 @@ void menu::core::lobby::main::events::joined_events() noexcept
 
     widgets::upper_title("joined events");
 
-    widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
+    widgets::window_with_margins("###search_event", scales::input, scales::margin_before_title);
 
     /*
      * when real data applied, ill do the fking searcher
@@ -575,7 +574,7 @@ void menu::core::lobby::main::search::search() noexcept
 
     char search_user[32] = {};
 
-    widgets::window_with_margins("###search_event", scales::input, scales::margin * 3);
+    widgets::window_with_margins("###search_user", scales::input, scales::margin_before_title);
 
     /*
      * when real data applied, ill do the fking searcher
@@ -591,11 +590,12 @@ void menu::core::lobby::main::search::search() noexcept
      */
     for (int i = 0; i <= 20; ++i)
     {
+        widgets::user(member_t(std::to_string(i), "user nº " + std::to_string(i), "62345678" + std::to_string(i), member_t::dance_type_e::jumpstyle), scales::user, scales::user_margin);
     }
 
     widgets::end_window_with_margins(scales::event_margin);
 
-    widgets::window_with_margins("###events_options", scales::option, scales::event_margin);
+    widgets::window_with_margins("###search_options", scales::option, scales::event_margin);
 
     if (widgets::body_button("filter"))
         go_to_tab(tab_t::_filter);
@@ -606,7 +606,14 @@ void menu::core::lobby::main::search::search() noexcept
 
 void menu::core::lobby::main::search::user::user_info() noexcept
 {
+    widgets::upper_title("user info");
 
+    widgets::window_with_margins("###user_info", scales::input * 2, scales::margin_before_title);
+
+    widgets::input("user name", strlen("user name"), "");
+    widgets::input("6233749495", strlen("6233749495"), "", false, ICON_FA_PHONE);
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::search::filter() noexcept

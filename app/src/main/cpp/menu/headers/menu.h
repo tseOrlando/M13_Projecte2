@@ -32,7 +32,6 @@ namespace menu
         inline event_t current_event;
         inline member_t current_member;
 
-
         inline ImVec2 get_font_size(ImFont* font) noexcept;
 
         namespace user_data
@@ -102,11 +101,15 @@ namespace menu
         inline float input  = 190.f;
         inline float combo  = 160.f;
         inline float scale  = 140.f;
+
         inline float event  = 370.f;
+        inline float user   = event;
+
         inline int   round  = 50.f;
         inline int   border = 0.f;
 
         inline float margin = 50.f;
+        inline float margin_before_title = margin * 3.f;
         inline float slight_space_between_widgets = margin / 5.f;
         inline float event_margin = margin / 3.f;
         inline float user_margin = event_margin;
