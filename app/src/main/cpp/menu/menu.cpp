@@ -106,6 +106,8 @@ bool menu::widgets::input_foot(char* text, std::size_t text_size, const std::str
  */
 const char* menu::widgets::combo(const char *label, const char *preview_value, std::vector<const char*> items,bool centered) noexcept { return wtools::combo(font::body, label, preview_value, items, centered); }
 
+
+bool menu::widgets::checkbox(const char *label, bool *v, bool centered) noexcept { return wtools::checkbox(font::body, label, v, centered); }
 /*
  * This represents the big title on every tab seen in Hard Motion.
  *
@@ -158,6 +160,7 @@ bool menu::widgets::window_with_margins(const std::string &label, float vertical
 
     return used;
 }
+
 /*
  * Custom 'ImGui::EndChild()' to add a margin at the end!
  */
@@ -201,7 +204,9 @@ bool menu::widgets::user(member_t member, float vertical_length, float vertical_
 
     foot_text(name, false, false);
 
-    foot_text(member.dance_type_str(), false, true);
+    std::string dance = member.dance_type_str();
+
+    foot_text(dance, false, true);
 
     if (widgets::foot_button("info"))
         go_to_tab(core::tab_t::_user_info);
@@ -217,6 +222,7 @@ bool menu::widgets::user(member_t member, float vertical_length, float vertical_
  */
 void menu::widgets::bulk(float more) noexcept { ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, scales::margin * more)); }
 
+
 /*
  * This function will update the tabs visually.
  *
@@ -227,7 +233,7 @@ void menu::widgets::bulk(float more) noexcept { ImGui::Dummy(ImVec2(ImGui::GetCo
  */
 void menu::core::go_to_tab(tab_t tab) noexcept
 {
-    if (tab < _landing or tab > _user)
+    if (tab < _landing or tab > _admin_panel)
         return;
 
     switch ((current_tab = tab))
@@ -433,9 +439,9 @@ void menu::core::lobby::main::events::events() noexcept
         widgets::event(event_t(std::to_string(i), "event nº " + std::to_string(i), "event info papapapapapapapapap"), scales::event, scales::event_margin);
     }
 
-    widgets::end_window_with_margins(scales::event_margin);
+    widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
-    widgets::window_with_margins("###events_options", scales::option * 2, scales::event_margin);
+    widgets::window_with_margins("###events_options", scales::option * 2, scales::slight_space_between_widgets);
 
     if (widgets::body_button("create"))
         go_to_tab(tab_t::_create_event);
@@ -503,13 +509,9 @@ void menu::core::lobby::main::events::members::member_info() noexcept
 {
     widgets::upper_title("member info");
 
-    widgets::window_with_margins("###member_info", scales::input * 2, scales::margin_before_title);
+    widgets::window_with_margins("###member_info", scales::input * 3, scales::margin_before_title);
 
-    std::string name = values::current_member.get_name();
-    std::string number = values::current_member.get_number();
-
-    widgets::input("member name", strlen("member name"), "");
-    widgets::input("6233749495", strlen("6233749495"), "", false, ICON_FA_PHONE);
+    // soon
 
     widgets::end_window_with_margins();
 }
@@ -528,7 +530,7 @@ void menu::core::lobby::main::events::create_event() noexcept
     widgets::input(event_title, sizeof event_title, "event title..");
     widgets::input_foot(event_info, sizeof event_info, "", true); //Multiline doesn't support hint
 
-    widgets::end_window_with_margins(scales::margin * 5);
+    widgets::end_window_with_margins(scales::margin * 6);
 
     widgets::window_with_margins("###upload", scales::option);
 
@@ -542,9 +544,9 @@ void menu::core::lobby::main::events::create_event() noexcept
 
 void menu::core::lobby::main::events::joined_events() noexcept
 {
-    char search_joined_event[32] = {};
-
     widgets::upper_title("joined events");
+
+    char search_joined_event[32] = {};
 
     widgets::window_with_margins("###search_event", scales::input, scales::margin_before_title);
 
@@ -593,9 +595,9 @@ void menu::core::lobby::main::search::search() noexcept
         widgets::user(member_t(std::to_string(i), "user nº " + std::to_string(i), "62345678" + std::to_string(i), member_t::dance_type_e::jumpstyle), scales::user, scales::user_margin);
     }
 
-    widgets::end_window_with_margins(scales::event_margin);
+    widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
-    widgets::window_with_margins("###search_options", scales::option, scales::event_margin);
+    widgets::window_with_margins("###search_options", scales::option, scales::margin * 4);
 
     if (widgets::body_button("filter"))
         go_to_tab(tab_t::_filter);
@@ -608,10 +610,7 @@ void menu::core::lobby::main::search::user::user_info() noexcept
 {
     widgets::upper_title("user info");
 
-    widgets::window_with_margins("###user_info", scales::input * 2, scales::margin_before_title);
-
-    widgets::input("user name", strlen("user name"), "");
-    widgets::input("6233749495", strlen("6233749495"), "", false, ICON_FA_PHONE);
+    widgets::window_with_margins("###user_info", scales::input * 2, scales::margin * 7);
 
     widgets::end_window_with_margins();
 }
@@ -619,6 +618,19 @@ void menu::core::lobby::main::search::user::user_info() noexcept
 void menu::core::lobby::main::search::filter() noexcept
 {
     widgets::upper_title("filter");
+
+    widgets::window_with_margins("###filter_options", scales::option * 2, scales::margin * 7);
+
+    wtools::align();
+    widgets::checkbox("jumpstyle", &values::jumpstyle_filter, false);
+
+    wtools::align();
+    widgets::checkbox("hakken/gabber", &values::hakken_gabber_filter, false);
+
+    wtools::align();
+    widgets::checkbox("shuffle", &values::shuffle_filter, false);
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::user::user() noexcept

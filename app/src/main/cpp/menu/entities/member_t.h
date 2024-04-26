@@ -22,7 +22,7 @@ public:
     const std::string &get_e_mail() const      { return e_mail; }
 
     const dance_type_e get_dance_type()        { return dance_type; }
-    const std::string& dance_type_str()
+    std::string dance_type_str()
     {
         switch (dance_type)
         {

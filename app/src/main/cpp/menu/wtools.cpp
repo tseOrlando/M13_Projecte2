@@ -132,6 +132,12 @@ bool wtools::input(ImFont *font, char* text, std::size_t text_size,  const std::
     return used;
 }
 
+/*
+ * This function is all-in-one for combo transformation
+ * You can :
+ * - Change the font
+ * - Center it
+ */
 const char* wtools::combo(ImFont* font, const char *label, const char* preview_value, std::vector<const char*> items, bool centered) noexcept
 {
     const char* selected_item = preview_value;
@@ -180,3 +186,25 @@ std::string wtools::get_curiosity_text(const std::string &text) noexcept
  * can do and add more features to this as well if needed
  */
 void wtools::align() noexcept { ImGui::SetCursorPosX(ImGui::GetCursorPosX() + menu::scales::margin); }
+
+/*
+ * This function is all-in-one for checkbox transformation
+ * You can :
+ * - Change the font
+ * - Center it
+ */
+bool wtools::checkbox(ImFont *font, const char *label, bool *v, bool centered) noexcept
+{
+    ImGui::PushFont(font);
+
+    float margin = menu::scales::margin / 2;
+
+    if (centered)
+        ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - margin));
+
+    bool used = ImGui::Checkbox(label, v);
+
+    ImGui::PopFont();
+
+    return used;
+}

@@ -1215,7 +1215,7 @@ bool ImGui::Checkbox(const char* label, bool* v)
         it_anim->second.alpha_from_lett = ImLerp(it_anim->second.alpha_from_lett, 175.f, 0.1f);
     }
 
-    RenderCheckMark(window->DrawList, check_bb.Min + ImVec2(it_anim->second.checkbox_move_motion + 3, padding), ImColor(menu::colors::global_red, menu::colors::global_green, menu::colors::global_blue, menu::colors::global_alpha), 5 + it_anim->second.hover_embiggened);
+    RenderCheckMark(window->DrawList, check_bb.Min + ImVec2(it_anim->second.checkbox_move_motion + 10, padding), ImColor(static_cast<int>(menu::colors::global_red), static_cast<int>(menu::colors::global_green), static_cast<int>(menu::colors::global_blue), static_cast<int>(it_anim->second.alpha_from_arrow)), 75 + it_anim->second.hover_embiggened);
 
     if (IsItemHovered()) it_anim->second.hover_embiggened = ImLerp(it_anim->second.hover_embiggened, 3.50f, 0.1f);
     else it_anim->second.hover_embiggened = ImLerp(it_anim->second.hover_embiggened, 0.40f, 0.1f);
@@ -1223,7 +1223,7 @@ bool ImGui::Checkbox(const char* label, bool* v)
     ImVec2 label_pos = ImVec2(check_bb.Max.x + style.ItemInnerSpacing.x, check_bb.Min.y + style.FramePadding.y);
     if (label_size.x > 0.0f)
     {
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, menu::colors::off_alpha));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, it_anim->second.alpha_from_lett));
         RenderText(label_pos, label);
         ImGui::PopStyleColor();
     }

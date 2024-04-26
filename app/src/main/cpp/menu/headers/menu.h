@@ -26,7 +26,10 @@ namespace menu
     namespace values
     {
         inline std::vector<const char *> dances = {"jumpstyle", "gabber/hakken", "shuffle" };
-        inline std::vector<bool> dance_filter = { false, false, false }; // jumpstyle - hakken/gabber - shuffle
+
+        inline bool jumpstyle_filter     = false;
+        inline bool hakken_gabber_filter = false;
+        inline bool shuffle_filter       = false;
 
         inline std::vector<event_t> events;
         inline event_t current_event;
@@ -73,26 +76,33 @@ namespace menu
 
     namespace widgets
     {
-        void head_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true)                                         noexcept;
-        void body_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true)                                         noexcept;
-        void foot_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true)                                         noexcept;
+        void head_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
+        void body_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
+        void foot_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
 
-        bool head_button(const std::string& text, bool centered = true)                                                              noexcept;
-        bool body_button(const std::string& text, bool centered = true)                                                              noexcept;
-        bool foot_button(const std::string& text, bool centered = true)                                                              noexcept;
+        bool head_button(const std::string& text, bool centered = true) noexcept;
+        bool body_button(const std::string& text, bool centered = true) noexcept;
+        bool foot_button(const std::string& text, bool centered = true) noexcept;
+
         bool input(char* text, std::size_t text_size, const std::string& hint, bool multi_line = false, const std::string& icon = "", ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
         bool input_foot(char* text, std::size_t text_size, const std::string& hint, bool multi_line = false, const std::string& icon = "", ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
-        const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true)        noexcept;
-        void upper_title(const std::string& text)                                                                                    noexcept;
 
-        void logo()                                                                                                                                                                      noexcept;
+        const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true) noexcept;
+
+        bool checkbox(const char* label, bool *v, bool centered = true) noexcept;
+
+        void upper_title(const std::string& text) noexcept;
+
+        void logo() noexcept;
 
         bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImVec4 col = colors::child, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
-        void end_window_with_margins(float vertical_margin = 0.f)                                                                                                                        noexcept;
+        void end_window_with_margins(float vertical_margin = 0.f) noexcept;
 
-        bool event(const event_t event, float vertical_length = 0.f, float vertical_margin = 0.f)   noexcept;
+        bool event(const event_t event, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
         bool user(const member_t member, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
-        void bulk(float more = 0)                                                                                                                                                                                                     noexcept;
+        void bulk(float more = 0) noexcept;
+
+
     }
 
     namespace scales
