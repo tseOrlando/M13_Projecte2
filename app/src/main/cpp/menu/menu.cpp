@@ -172,6 +172,9 @@ void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
         ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, vertical_margin));
 }
 
+/*
+ * a event, represented
+ */
 bool menu::widgets::event(const event_t event, float vertical_length, float vertical_margin) noexcept
 {
     std::string event_name = event.get_name();
@@ -221,6 +224,18 @@ bool menu::widgets::user(member_t member, float vertical_length, float vertical_
  * Used for those functions that doesn't have any default margin
  */
 void menu::widgets::bulk(float more) noexcept { ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, scales::margin * more)); }
+
+/*
+ * Recycling input text, I made a lazy block info to show user and member info
+ */
+void menu::widgets::info_block(const std::string& info, const std::string& icon) noexcept
+{
+    char* info_cchar = strdup(info.c_str());
+
+    widgets::input(info_cchar, strlen(info_cchar), "", false, icon, ImGuiInputTextFlags_ReadOnly);
+
+    free(info_cchar); //deam
+}
 
 
 /*
@@ -464,19 +479,25 @@ void menu::core::lobby::main::events::event_info() noexcept
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
-    widgets::window_with_margins("###event_info_with_description", scales::option + (scales::event * 2), scales::slight_space_between_widgets);
+    widgets::window_with_margins("###event_info_with_description", scales::option + (scales::event * 2) / 1.2, scales::slight_space_between_widgets);
 
     wtools::align();
     widgets::foot_text("Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas \"Letraset\", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.", true, false, false);
 
-    widgets::end_window_with_margins(scales::margin_before_title);
+    widgets::end_window_with_margins(scales::margin * 4);
 
-    widgets::window_with_margins("###members", scales::option);
+    widgets::window_with_margins("###members", scales::option * 2);
 
     if (widgets::body_button("members"))
     {
         //procedure
         go_to_tab(tab_t::_event_members);
+    }
+
+    if (widgets::body_button("join"))
+    {
+        //procedure
+        go_back();
     }
 
     widgets::end_window_with_margins();
@@ -498,8 +519,13 @@ void menu::core::lobby::main::events::members::event_members() noexcept
 
     for (int i = 0; i <= 20; ++i)
     {
-        if (widgets::foot_button("member nº" + std::to_string(i)))
+        std::string member_demo = "member nº" + std::to_string(i);
+
+        if (widgets::foot_button(member_demo))
+        {
             go_to_tab(tab_t::_member_info);
+            values::current_member = member_t(std::to_string(i), member_demo, "6736723472374", member_t::dance_type_e::hakken_gabber);
+        }
     }
 
     widgets::end_window_with_margins();
@@ -511,7 +537,9 @@ void menu::core::lobby::main::events::members::member_info() noexcept
 
     widgets::window_with_margins("###member_info", scales::input * 3, scales::margin_before_title);
 
-    // soon
+    widgets::info_block(values::current_member.get_name());
+    widgets::info_block(values::current_member.get_number());
+    widgets::info_block(values::current_member.dance_type_str());
 
     widgets::end_window_with_margins();
 }
@@ -592,7 +620,13 @@ void menu::core::lobby::main::search::search() noexcept
      */
     for (int i = 0; i <= 20; ++i)
     {
-        widgets::user(member_t(std::to_string(i), "user nº " + std::to_string(i), "62345678" + std::to_string(i), member_t::dance_type_e::jumpstyle), scales::user, scales::user_margin);
+        std::string member_demo = "user nº" + std::to_string(i);
+
+        if (widgets::foot_button(member_demo))
+        {
+            go_to_tab(tab_t::_user_info);
+            values::current_member = member_t(std::to_string(i), member_demo, "6736723472374", member_t::dance_type_e::hakken_gabber);
+        }
     }
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
@@ -610,7 +644,11 @@ void menu::core::lobby::main::search::user::user_info() noexcept
 {
     widgets::upper_title("user info");
 
-    widgets::window_with_margins("###user_info", scales::input * 2, scales::margin * 7);
+    widgets::window_with_margins("###user_info", scales::input * 3, scales::margin * 7);
+
+    widgets::info_block(values::current_member.get_name());
+    widgets::info_block(values::current_member.get_number());
+    widgets::info_block(values::current_member.dance_type_str());
 
     widgets::end_window_with_margins();
 }
@@ -636,16 +674,52 @@ void menu::core::lobby::main::search::filter() noexcept
 void menu::core::lobby::main::user::user() noexcept
 {
     widgets::upper_title("user");
+
+    widgets::window_with_margins("###user_info_local", scales::info * 3, scales::margin_before_title);
+
+    widgets::info_block(values::user_data::user_name);
+    widgets::info_block(values::user_data::number);
+    widgets::info_block(values::user_data::dance);
+
+    widgets::end_window_with_margins(scales::margin * 4);
+
+    widgets::window_with_margins("###edit_info", scales::option);
+
+    if (widgets::body_button("edit"))
+    {
+        go_to_tab(tab_t::_edit_user_info);
+    }
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::user::edit_user_info() noexcept
 {
     widgets::upper_title("edit");
+
+    widgets::window_with_margins("###edit_panel", scales::info * 3, scales::margin_before_title);
+
+    //...
+
+    widgets::end_window_with_margins(scales::margin * 4);
+
+    widgets::window_with_margins("###edit_info", scales::option);
+
+    if (widgets::body_button("apply"))
+        go_back();
+
+    widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::user::admin_panel() noexcept
 {
     widgets::upper_title("admin panel");
+
+    widgets::window_with_margins("###admin_panel", scales::info * 3, scales::margin_before_title);
+
+    //...
+
+    widgets::end_window_with_margins(scales::margin * 4);
 }
 
 ImVec2 menu::values::get_font_size(ImFont *font) noexcept

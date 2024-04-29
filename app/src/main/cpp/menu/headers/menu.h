@@ -46,6 +46,7 @@ namespace menu
             inline const char* dance;
 
             inline bool logged_in = false;
+            inline bool is_admin = false;
         }
     }
 
@@ -102,7 +103,7 @@ namespace menu
         bool user(const member_t member, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
         void bulk(float more = 0) noexcept;
 
-
+        void info_block(const std::string& info, const std::string& icon = "") noexcept;
     }
 
     namespace scales
@@ -111,6 +112,7 @@ namespace menu
         inline float input  = 190.f;
         inline float combo  = 160.f;
         inline float scale  = 140.f;
+        inline float info   = 190.f;
 
         inline float event  = 370.f;
         inline float user   = event;
