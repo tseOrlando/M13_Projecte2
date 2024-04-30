@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
         ${CMAKE_CURRENT_SOURCE_DIR}/native-lib.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/menu/animation/engine.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/menu/menu.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/menu/wtools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/../../imgui.cpp

@@ -8,6 +8,7 @@
 #include "icons/icon_data.h"
 #include "icons/icons.h"
 #include "main/cpp/menu/entities/event_t.h"
+#include "animation/animation.h"
 
 #ifndef HARD_MOTION_MENU_H
 #define HARD_MOTION_MENU_H
@@ -33,6 +34,7 @@ namespace menu
 
         inline std::vector<event_t> events;
         inline event_t current_event;
+        inline std::vector<member_t> current_members;
         inline member_t current_member;
 
         inline ImVec2 get_font_size(ImFont* font) noexcept;

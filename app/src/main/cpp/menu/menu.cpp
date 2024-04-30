@@ -187,6 +187,7 @@ bool menu::widgets::event(const event_t event, float vertical_length, float vert
 
     if (widgets::foot_button("info"))
     {
+        values::current_event = event;
         core::go_to_tab(core::tab_t::_event_info);
     }
 
@@ -475,16 +476,16 @@ void menu::core::lobby::main::events::event_info() noexcept
 
     widgets::window_with_margins("###event_title", body_size_y_with_pad, scales::margin_before_title);
 
-    widgets::body_text("event title");
+    widgets::body_text(values::current_event.get_name());
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
     widgets::window_with_margins("###event_info_with_description", scales::option + (scales::event * 2) / 1.2, scales::slight_space_between_widgets);
 
     wtools::align();
-    widgets::foot_text("Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas \"Letraset\", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.", true, false, false);
+    widgets::foot_text(values::current_event.get_info(), true, false, false);
 
-    widgets::end_window_with_margins(scales::margin * 4);
+    widgets::end_window_with_margins(scales::margin * 3.5);
 
     widgets::window_with_margins("###members", scales::option * 2);
 

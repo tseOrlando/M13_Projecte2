@@ -9,6 +9,11 @@
  * In order to not be redundant, add the needed libraries in common in one file!
  */
 
+#define WIN32_LEAN_AND_MEAN
+
+#include <stdio.h>
+#include <Windows.h>
+
 #include <stdio.h>
 #include <vector>
 #include <string>
@@ -21,6 +26,7 @@
 #include <iostream>
 #include <regex>
 #include <map>
+#include <sstream>
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -36,5 +42,6 @@
 #include <GLES3/gl3.h>
 
 #include "../menu/headers/wtools/wtools.h"
+#include "../menu/headers/wtools/random.h"
 
 #endif //HARD_MOTION_GINC_H
