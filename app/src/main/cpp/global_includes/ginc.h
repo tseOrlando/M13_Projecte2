@@ -9,11 +9,6 @@
  * In order to not be redundant, add the needed libraries in common in one file!
  */
 
-#define WIN32_LEAN_AND_MEAN
-
-#include <stdio.h>
-#include <Windows.h>
-
 #include <stdio.h>
 #include <vector>
 #include <string>
@@ -36,6 +31,9 @@
 #include <android/log.h>
 #include <android_native_app_glue.h>
 #include <android/asset_manager.h>
+#include <android/rect.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 #include <jni.h>
 
 #include <EGL/egl.h>

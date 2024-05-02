@@ -4,6 +4,7 @@ import android.app.NativeActivity
 import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.Surface
 import android.view.inputmethod.InputMethodManager
 import java.util.concurrent.LinkedBlockingQueue
 
