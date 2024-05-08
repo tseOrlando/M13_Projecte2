@@ -8,6 +8,7 @@
 #include "icons/icon_data.h"
 #include "icons/icons.h"
 #include "main/cpp/menu/entities/event_t.h"
+#include "main/cpp/menu/entities/api_rest_fetch.h"
 
 #ifndef HARD_MOTION_MENU_H
 #define HARD_MOTION_MENU_H
