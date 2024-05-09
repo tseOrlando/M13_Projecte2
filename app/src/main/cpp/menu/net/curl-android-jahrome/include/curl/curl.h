@@ -31,7 +31,7 @@
  */
 
 #include "curlver.h"         /* libcurl version defines   */
-#include "curlbuild.h"       /* libcurl build definitions */
+#include "curlbuild.h.dist"       /* libcurl build definitions */
 #include "curlrules.h"       /* libcurl rules enforcement */
 
 /*

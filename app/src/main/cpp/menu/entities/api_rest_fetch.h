@@ -9,10 +9,11 @@
 
 namespace api_rest_fetch
 {
-    inline CURL * peer = nullptr;
     inline std::string base_url = "127.0.0.1:8000/";
 
-    bool  init()
+    size_t write_callback(void *contents, size_t size, size_t nmemb, std::string *response) noexcept;
+
+    std::string generate_request(const std::string& url, const std::string& request_type, const std::string& post_data = "") noexcept;
 
     std::string _get(const std::string& url) noexcept;
     std::string _post(const std::string& url, const std::string& data) noexcept;
