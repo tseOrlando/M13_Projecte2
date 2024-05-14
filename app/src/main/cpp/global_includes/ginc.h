@@ -42,4 +42,7 @@
 #include "../menu/headers/wtools/wtools.h"
 #include "../menu/headers/wtools/random.h"
 
+#include "../menu/json.hpp"
+#include "../menu/entities/api_rest_fetch.h"
+
 #endif //HARD_MOTION_GINC_H
