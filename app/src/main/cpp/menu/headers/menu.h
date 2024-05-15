@@ -26,7 +26,7 @@ namespace menu
 
     namespace values
     {
-        inline std::vector<const char *> dances = {"jumpstyle", "gabber/hakken", "shuffle" };
+        inline std::vector<const char *> dances = {"jumpstyle", "hakken_gabber", "shuffle" };
 
         inline bool jumpstyle_filter     = false;
         inline bool hakken_gabber_filter = false;

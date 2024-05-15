@@ -45,3 +45,15 @@ std::string api_rest_fetch::_get(const std::string& url) noexcept { return gener
 std::string api_rest_fetch::_post(const std::string& url, const std::string& data) noexcept { return generate_request(url, "POST", data); }
 
 std::string api_rest_fetch::_delete(const std::string& url) noexcept { return generate_request(url, "DELETE"); }
+
+std::string api_rest_fetch::get_latest_id(const std::string &from) noexcept { return _get(base_url + from + "/latest"); }
+
+std::string api_rest_fetch::get_events() noexcept { return _get(base_url + "/events"); }
+
+std::string api_rest_fetch::get_members() noexcept { return _get(base_url + "/members"); }
+
+std::string api_rest_fetch::delete_event(const std::string &id) noexcept { return _delete(base_url + "/event/" + id); }
+
+std::string api_rest_fetch::delete_member(const std::string &id) noexcept { return _delete(base_url + "/event/" + id); }
+
+std::string api_rest_fetch::get_member_password(const std::string &name) noexcept { return _get(base_url + "member_password/" + name); }

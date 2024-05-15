@@ -177,7 +177,7 @@ void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
  */
 bool menu::widgets::event(const event_t event, float vertical_length, float vertical_margin) noexcept
 {
-    std::string event_name = event.get_name();
+    std::string event_name = event.get_title();
 
     bool used = window_with_margins(event_name, vertical_length, vertical_margin, colors::widgets);
 
@@ -208,7 +208,7 @@ bool menu::widgets::user(member_t member, float vertical_length, float vertical_
 
     foot_text(name, false, false);
 
-    std::string dance = member.dance_type_str();
+    std::string dance = member.get_dance_type();
 
     foot_text(dance, false, true);
 
@@ -372,8 +372,8 @@ void menu::core::lobby::auth::log_in() noexcept
 
     if (widgets::body_button("login"))
     {
-        //-.- check
-        go_to_tab(tab_t::_hub);
+        if (api_rest_fetch::get_member_password(values::user_data::user_name) == values::user_data::pass_word)
+            go_to_tab(tab_t::_hub);
     }
 
     widgets::end_window_with_margins();
@@ -390,8 +390,8 @@ void menu::core::lobby::auth::register_in() noexcept
 
     widgets::input(values::user_data::user_name, sizeof values::user_data::user_name, "username..");
     widgets::input(values::user_data::pass_word, sizeof values::user_data::pass_word, "password..", false, "", ImGuiInputTextFlags_Password);
-    widgets::input(values::user_data::e_mail, sizeof values::user_data::e_mail, "e-mail..");
     widgets::input(values::user_data::number, sizeof values::user_data::number, "number..");
+    widgets::input(values::user_data::e_mail, sizeof values::user_data::e_mail, "e-mail..");
 
     /*
      * kek
@@ -405,8 +405,12 @@ void menu::core::lobby::auth::register_in() noexcept
 
     if (widgets::body_button("register"))
     {
-        //-.- check
-        go_to_tab(tab_t::_hub);
+        std::string latest_id = api_rest_fetch::get_latest_id("members");
+
+        member_t registered_member(latest_id, values::user_data::user_name, values::user_data::pass_word, values::user_data::number, values::user_data::e_mail);
+
+        if (registered_member.save());
+            go_to_tab(tab_t::_hub);
     }
 
     widgets::end_window_with_margins();
@@ -476,7 +480,7 @@ void menu::core::lobby::main::events::event_info() noexcept
 
     widgets::window_with_margins("###event_title", body_size_y_with_pad, scales::margin_before_title);
 
-    widgets::body_text(values::current_event.get_name());
+    widgets::body_text(values::current_event.get_title());
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
@@ -525,7 +529,7 @@ void menu::core::lobby::main::events::members::event_members() noexcept
         if (widgets::foot_button(member_demo))
         {
             go_to_tab(tab_t::_member_info);
-            values::current_member = member_t(std::to_string(i), member_demo, "6736723472374", member_t::dance_type_e::hakken_gabber);
+            //values::current_member = member_t(std::to_string(i), member_demo, "6736723472374", member_t::dance_type_e::hakken_gabber);
         }
     }
 
@@ -540,7 +544,7 @@ void menu::core::lobby::main::events::members::member_info() noexcept
 
     widgets::info_block(values::current_member.get_name());
     widgets::info_block(values::current_member.get_number());
-    widgets::info_block(values::current_member.dance_type_str());
+    widgets::info_block(values::current_member.get_dance_type());
 
     widgets::end_window_with_margins();
 }
@@ -626,7 +630,7 @@ void menu::core::lobby::main::search::search() noexcept
         if (widgets::foot_button(member_demo))
         {
             go_to_tab(tab_t::_user_info);
-            values::current_member = member_t(std::to_string(i), member_demo, "6736723472374", member_t::dance_type_e::hakken_gabber);
+            //values::current_member = member_t(std::to_string(i), member_demo, "6736723472374", member_t::dance_type_e::hakken_gabber);
         }
     }
 
@@ -649,7 +653,7 @@ void menu::core::lobby::main::search::user::user_info() noexcept
 
     widgets::info_block(values::current_member.get_name());
     widgets::info_block(values::current_member.get_number());
-    widgets::info_block(values::current_member.dance_type_str());
+    widgets::info_block(values::current_member.get_dance_type());
 
     widgets::end_window_with_margins();
 }
