@@ -5,7 +5,7 @@
 #ifndef HARD_MOTION_API_REST_FETCH_H
 #define HARD_MOTION_API_REST_FETCH_H
 
-#include "../net/curl-android-jahrome/include/curl/curl.h"
+
 
 namespace api_rest_fetch
 {
