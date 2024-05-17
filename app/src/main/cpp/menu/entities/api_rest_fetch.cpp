@@ -45,7 +45,7 @@ std::string api_rest_fetch::_get(const std::string& url) noexcept { return gener
 std::string api_rest_fetch::_post(const std::string& url, const std::string& data) noexcept { return generate_request(url, "POST", data); }
 
 std::string api_rest_fetch::_delete(const std::string& url) noexcept { return generate_request(url, "DELETE"); }
-
+//
 std::string api_rest_fetch::get_latest_id(const std::string &from) noexcept { return _get(base_url + from + "/latest"); }
 
 std::string api_rest_fetch::get_events() noexcept { return _get(base_url + "/events"); }
