@@ -32,7 +32,7 @@ std::string api_rest_fetch::generate_request(const std::string &url, const std::
         res = curl_easy_perform(curl);
 
         if (res != CURLE_OK)
-            std::cerr << "err : " << curl_easy_strerror(res) << std::endl;
+            __android_log_print(ANDROID_LOG_INFO, "curl ", "%s", curl_easy_strerror(res));
 
         curl_easy_cleanup(curl);
     }
@@ -56,4 +56,4 @@ std::string api_rest_fetch::delete_event(const std::string &id) noexcept { retur
 
 std::string api_rest_fetch::delete_member(const std::string &id) noexcept { return _delete(base_url + "/event/" + id); }
 
-std::string api_rest_fetch::get_member_password(const std::string &name) noexcept { return _get(base_url + "member_password/" + name); }
+std::string api_rest_fetch::get_member_password(const std::string &name) noexcept { return _get(base_url + "/member_password/" + name); }

@@ -409,7 +409,7 @@ void menu::core::lobby::auth::register_in() noexcept
 
         member_t registered_member(latest_id, values::user_data::user_name, values::user_data::pass_word, values::user_data::number, values::user_data::e_mail);
 
-        if (registered_member.save());
+        if (registered_member.save())
             go_to_tab(tab_t::_hub);
     }
 

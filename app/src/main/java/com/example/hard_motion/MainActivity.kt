@@ -3,14 +3,15 @@ package imgui.example.android
 import android.app.NativeActivity
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
-import android.view.Surface
 import android.view.inputmethod.InputMethodManager
 import java.util.concurrent.LinkedBlockingQueue
 
+
 class MainActivity : NativeActivity()
 {
-
     init { System.loadLibrary("ImGuiExample") }
 
     public override fun onCreate(savedInstanceState: Bundle?)

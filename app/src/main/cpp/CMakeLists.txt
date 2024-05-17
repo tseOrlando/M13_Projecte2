@@ -35,9 +35,11 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
   ${ANDROID_NDK}/sources/android/native_app_glue
 )
 
+find_package(curl REQUIRED CONFIG)
+
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
   android
   EGL
   GLESv3
   log
-)
+  curl::curl_static)

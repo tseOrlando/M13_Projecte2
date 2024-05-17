@@ -22,6 +22,8 @@
 #include <regex>
 #include <map>
 #include <sstream>
+#include <thread>
+#include <future>
 
 #include "imgui.h"
 #include "imgui_internal.h"

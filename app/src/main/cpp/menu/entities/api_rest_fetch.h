@@ -5,11 +5,11 @@
 #ifndef HARD_MOTION_API_REST_FETCH_H
 #define HARD_MOTION_API_REST_FETCH_H
 
-#include "../net/curl-android-jahrome/include/curl/curl.h"
+#include <curl/include/curl/curl.h>
 
 namespace api_rest_fetch
 {
-    inline std::string base_url = "127.0.0.1:8000";
+    inline std::string base_url = "http://192.168.0.27:8000";
 
     size_t write_callback(void *contents, size_t size, size_t nmemb, std::string *response) noexcept;
 
