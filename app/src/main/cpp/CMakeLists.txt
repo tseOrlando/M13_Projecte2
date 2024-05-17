@@ -34,6 +34,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../../backends
   ${ANDROID_NDK}/sources/android/native_app_glue
 )
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE include)
 
 find_package(curl REQUIRED CONFIG)
 

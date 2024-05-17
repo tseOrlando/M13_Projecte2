@@ -7,8 +7,6 @@
 #include "fonts/manrope.h"
 #include "icons/icon_data.h"
 #include "icons/icons.h"
-#include "main/cpp/menu/entities/event_t.h"
-#include "main/cpp/menu/entities/api_rest_fetch.h"
 
 #ifndef HARD_MOTION_MENU_H
 #define HARD_MOTION_MENU_H
@@ -24,6 +22,13 @@ namespace menu
 
     constexpr int flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
+    namespace helper
+    {
+        void erase_array_data(char * arr) noexcept;
+        bool validate_field(const char * field) noexcept;
+        bool validate_fields(std::vector<const char *> fields) noexcept;
+    }
+
     namespace values
     {
         inline std::vector<const char *> dances = {"jumpstyle", "hakken_gabber", "shuffle" };
@@ -32,9 +37,10 @@ namespace menu
         inline bool hakken_gabber_filter = false;
         inline bool shuffle_filter       = false;
 
-        inline std::vector<event_t> events;
-        inline event_t current_event;
+        inline std::vector<event_t> current_events;
         inline std::vector<member_t> current_members;
+
+        inline event_t current_event;
         inline member_t current_member;
 
         inline ImVec2 get_font_size(ImFont* font) noexcept;
@@ -44,8 +50,10 @@ namespace menu
             inline char user_name[16] = {};
             inline char pass_word[16] = {};
             inline char e_mail[32]    = {};
-            inline char number[9]     = {};
+            inline char number[10]     = {};
             inline const char* dance;
+
+            inline member_t member_local;
 
             inline bool logged_in = false;
             inline bool is_admin = false;
@@ -75,37 +83,6 @@ namespace menu
         inline ImFont* head = nullptr;
         inline ImFont* body = nullptr;
         inline ImFont* foot = nullptr;
-    }
-
-    namespace widgets
-    {
-        void head_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
-        void body_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
-        void foot_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
-
-        bool head_button(const std::string& text, bool centered = true) noexcept;
-        bool body_button(const std::string& text, bool centered = true) noexcept;
-        bool foot_button(const std::string& text, bool centered = true) noexcept;
-
-        bool input(char* text, std::size_t text_size, const std::string& hint, bool multi_line = false, const std::string& icon = "", ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
-        bool input_foot(char* text, std::size_t text_size, const std::string& hint, bool multi_line = false, const std::string& icon = "", ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
-
-        const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true) noexcept;
-
-        bool checkbox(const char* label, bool *v, bool centered = true) noexcept;
-
-        void upper_title(const std::string& text) noexcept;
-
-        void logo() noexcept;
-
-        bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImVec4 col = colors::child, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
-        void end_window_with_margins(float vertical_margin = 0.f) noexcept;
-
-        bool event(const event_t event, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
-        bool user(const member_t member, float vertical_length = 0.f, float vertical_margin = 0.f) noexcept;
-        void bulk(float more = 0) noexcept;
-
-        void info_block(const std::string& info, const std::string& icon = "") noexcept;
     }
 
     namespace scales
@@ -207,6 +184,37 @@ namespace menu
                 }
             }
         }
+    }
+
+    namespace widgets
+    {
+        void head_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
+        void body_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
+        void foot_text(const std::string& text, bool multi_line = false, bool disabled = false, bool centered = true) noexcept;
+
+        bool head_button(const std::string& text, bool centered = true) noexcept;
+        bool body_button(const std::string& text, bool centered = true) noexcept;
+        bool foot_button(const std::string& text, bool centered = true) noexcept;
+
+        bool input(char* text, std::size_t text_size, const std::string& hint, bool multi_line = false, const std::string& icon = "", ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
+        bool input_foot(char* text, std::size_t text_size, const std::string& hint, bool multi_line = false, const std::string& icon = "", ImGuiInputTextFlags iflags = 0, bool centered = true) noexcept;
+
+        const char* combo(const char *label, const char* preview_value, std::vector<const char*> items, bool centered = true) noexcept;
+
+        bool checkbox(const char* label, bool *v, bool centered = true) noexcept;
+
+        void upper_title(const std::string& text) noexcept;
+
+        void logo() noexcept;
+
+        bool window_with_margins(const std::string &label, float vertical_length = 0.f, float vertical_margin = 0.f, ImVec4 col = colors::child, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) noexcept;
+        void end_window_with_margins(float vertical_margin = 0.f) noexcept;
+
+        bool event(const event_t event) noexcept;
+        bool user(const member_t member, core::tab_t destiny) noexcept;
+        void bulk(float more = 0) noexcept;
+
+        void info_block(const std::string& info, const std::string& icon = "") noexcept;
     }
 }
 

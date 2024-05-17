@@ -175,11 +175,11 @@ void menu::widgets::end_window_with_margins(float vertical_margin) noexcept
 /*
  * a event, represented
  */
-bool menu::widgets::event(const event_t event, float vertical_length, float vertical_margin) noexcept
+bool menu::widgets::event(const event_t event) noexcept
 {
     std::string event_name = event.get_title();
 
-    bool used = window_with_margins(event_name, vertical_length, vertical_margin, colors::widgets);
+    bool used = window_with_margins("###" + event_name, scales::event, scales::event_margin, colors::widgets);
 
     foot_text(event_name, false, false);
 
@@ -191,7 +191,7 @@ bool menu::widgets::event(const event_t event, float vertical_length, float vert
         core::go_to_tab(core::tab_t::_event_info);
     }
 
-    end_window_with_margins(vertical_margin);
+    end_window_with_margins(scales::event_margin);
 
     return used;
 }
@@ -200,11 +200,11 @@ bool menu::widgets::event(const event_t event, float vertical_length, float vert
  *
  * User searched on the user searcher
  */
-bool menu::widgets::user(member_t member, float vertical_length, float vertical_margin) noexcept
+bool menu::widgets::user(member_t member, core::tab_t destiny) noexcept
 {
     std::string name = member.get_name();
 
-    bool used = window_with_margins(name, vertical_length, vertical_margin, colors::widgets);
+    bool used = window_with_margins(name, scales::user,scales::user_margin, colors::widgets);
 
     foot_text(name, false, false);
 
@@ -213,9 +213,12 @@ bool menu::widgets::user(member_t member, float vertical_length, float vertical_
     foot_text(dance, false, true);
 
     if (widgets::foot_button("info"))
-        go_to_tab(core::tab_t::_user_info);
+    {
+        values::current_member = member;
+        go_to_tab(destiny);
+    }
 
-    end_window_with_margins(vertical_margin);
+    end_window_with_margins(scales::user_margin);
 
     return used;
 }
@@ -237,7 +240,6 @@ void menu::widgets::info_block(const std::string& info, const std::string& icon)
 
     free(info_cchar); //deam
 }
-
 
 /*
  * This function will update the tabs visually.
@@ -314,7 +316,7 @@ void menu::core::go_back() noexcept
             break;
 
         case _member_info:
-            go_to_tab(_event_info);
+            go_to_tab(_event_members);
             break;
 
         case _create_event:
@@ -372,8 +374,22 @@ void menu::core::lobby::auth::log_in() noexcept
 
     if (widgets::body_button("login"))
     {
-        if (api_rest_fetch::get_member_password(values::user_data::user_name) == values::user_data::pass_word)
-            go_to_tab(tab_t::_hub);
+        if (helper::validate_fields({values::user_data::user_name,
+                                         values::user_data::pass_word}))
+        {
+            std::pair<bool, member_t> result = api_rest_fetch::get_member_by_name(values::user_data::user_name);
+
+            member_t member_requested = result.second;
+
+            if (result.first && member_requested.get_password() == values::user_data::pass_word)
+            {
+                helper::erase_array_data(values::user_data::user_name);
+                helper::erase_array_data(values::user_data::pass_word);
+                values::user_data::member_local = member_requested;
+                go_to_tab(tab_t::_hub);
+            }
+        }
+
     }
 
     widgets::end_window_with_margins();
@@ -405,13 +421,22 @@ void menu::core::lobby::auth::register_in() noexcept
 
     if (widgets::body_button("register"))
     {
-        std::string latest_id = api_rest_fetch::get_latest_id("members");
-
-        member_t registered_member(latest_id, values::user_data::user_name, values::user_data::pass_word, values::user_data::number, values::user_data::e_mail);
-
-        if (registered_member.save())
+        if (helper::validate_fields({values::user_data::user_name,
+                                     values::user_data::pass_word,
+                                     values::user_data::number,
+                                     values::user_data::e_mail,
+                                     values::user_data::dance}) and api_rest_fetch::post_member(member_t(values::user_data::user_name, values::user_data::pass_word, values::user_data::number, values::user_data::e_mail, values::user_data::dance)))
+        {
+            helper::erase_array_data(values::user_data::user_name);
+            helper::erase_array_data(values::user_data::pass_word);
+            helper::erase_array_data(values::user_data::number);
+            helper::erase_array_data(values::user_data::e_mail);
+            helper::erase_array_data(values::user_data::e_mail);
             go_to_tab(tab_t::_hub);
+        }
     }
+
+
 
     widgets::end_window_with_margins();
 }
@@ -436,28 +461,28 @@ void menu::core::lobby::main::hub() noexcept
 
 void menu::core::lobby::main::events::events() noexcept
 {
-    char search_event[32] = {};
+    static char search_event[32] = {};
 
     widgets::upper_title("events");
 
     widgets::window_with_margins("###search_event", scales::input, scales::margin_before_title);
 
-    /*
-     * when real data applied, ill do the fking searcher
-     */
     widgets::input(search_event, sizeof search_event, "event..", false, ICON_FA_SEARCH);
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
     widgets::window_with_margins("###events", scales::option * 4, scales::slight_space_between_widgets, colors::child, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-    /*
-     * sample data
-     */
-    for (int i = 0; i <= 10; i++)
+    static bool refresh_events = false;
+
+    if (!refresh_events)
     {
-        widgets::event(event_t(std::to_string(i), "event nº " + std::to_string(i), "event info papapapapapapapapap"), scales::event, scales::event_margin);
+        values::current_events = api_rest_fetch::get_events();
+        refresh_events = true;
     }
+
+    for (event_t event : values::current_events)
+        widgets::event(event);
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
@@ -467,7 +492,11 @@ void menu::core::lobby::main::events::events() noexcept
         go_to_tab(tab_t::_create_event);
 
     if (widgets::body_button("joined"))
+    {
+        refresh_events = false;
+        values::current_events = api_rest_fetch::get_events_from_member(values::user_data::member_local.get_id());
         go_to_tab(tab_t::_joined_events);
+    }
 
     widgets::end_window_with_margins();
 }
@@ -495,43 +524,31 @@ void menu::core::lobby::main::events::event_info() noexcept
 
     if (widgets::body_button("members"))
     {
-        //procedure
+        values::current_members = api_rest_fetch::get_members_from_event(values::current_event.get_id());
         go_to_tab(tab_t::_event_members);
     }
 
     if (widgets::body_button("join"))
-    {
-        //procedure
-        go_back();
-    }
+        if (api_rest_fetch::join_member_to_event(values::user_data::member_local.get_id(), values::current_event.get_id()))
+            go_back();
 
     widgets::end_window_with_margins();
 }
 
 void menu::core::lobby::main::events::members::event_members() noexcept
 {
-    char search_member[32] = {};
+    static char search_member[32] = {};
     widgets::upper_title("members");
 
-    /*
-     * TODO OPTIONAL: if user list count less than 6 don't add the search bar
-     */
     widgets::window_with_margins("###members_search", scales::input, scales::margin_before_title);
     widgets::input(search_member, sizeof search_member, "member..", false,ICON_FA_SEARCH);
     widgets::end_window_with_margins(scales::event_margin);
 
     widgets::window_with_margins("###members_names", scales::option * 6, scales::slight_space_between_widgets);
 
-    for (int i = 0; i <= 20; ++i)
-    {
-        std::string member_demo = "member nº" + std::to_string(i);
-
-        if (widgets::foot_button(member_demo))
-        {
-            go_to_tab(tab_t::_member_info);
-            //values::current_member = member_t(std::to_string(i), member_demo, "6736723472374", member_t::dance_type_e::hakken_gabber);
-        }
-    }
+    for (member_t member : values::current_members)
+        if (member.get_name().find(search_member) != std::string::npos)
+            widgets::user(member, tab_t::_member_info);
 
     widgets::end_window_with_margins();
 }
@@ -551,8 +568,8 @@ void menu::core::lobby::main::events::members::member_info() noexcept
 
 void menu::core::lobby::main::events::create_event() noexcept
 {
-    char event_title[32]  = {};
-    char event_info[255]  = {};
+    static char event_title[32]  = {};
+    static char event_info[255]  = {};
 
     float default_scale = scales::margin_before_title;
 
@@ -568,9 +585,9 @@ void menu::core::lobby::main::events::create_event() noexcept
     widgets::window_with_margins("###upload", scales::option);
 
     if (widgets::body_button("upload"))
-    {
-        //:.:
-    }
+        if (helper::validate_fields({event_title, event_info}))
+            if (api_rest_fetch::post_event(event_t(std::string(event_title), std::string(event_info))))
+                go_to_tab(tab_t::_events);
 
     widgets::end_window_with_margins();
 }
@@ -579,26 +596,19 @@ void menu::core::lobby::main::events::joined_events() noexcept
 {
     widgets::upper_title("joined events");
 
-    char search_joined_event[32] = {};
+    static char search_joined_event[32] = {};
 
     widgets::window_with_margins("###search_event", scales::input, scales::margin_before_title);
 
-    /*
-     * when real data applied, ill do the fking searcher
-     */
     widgets::input(search_joined_event, sizeof search_joined_event, " joined event..", false, ICON_FA_SEARCH);
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
     widgets::window_with_margins("###joined_events", scales::option * 6, scales::slight_space_between_widgets, colors::child, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-    /*
-     * sample data
-     */
-    for (int i = 0; i <= 10; i++)
-    {
-        widgets::event(event_t(std::to_string(i), "event nº " + std::to_string(i), "event info kjraarjjrhjhrajharj"), scales::event, scales::event_margin);
-    }
+    for (event_t event : values::current_events)
+        if (event.get_title().find(search_joined_event) != std::string::npos)
+            widgets::event(event);
 
     widgets::end_window_with_margins();
 }
@@ -607,32 +617,26 @@ void menu::core::lobby::main::search::search() noexcept
 {
     widgets::upper_title("search");
 
-    char search_user[32] = {};
+    static char search_user[32] = {};
 
     widgets::window_with_margins("###search_user", scales::input, scales::margin_before_title);
 
-    /*
-     * when real data applied, ill do the fking searcher
-     */
     widgets::input(search_user, sizeof search_user, "user..", false, ICON_FA_SEARCH);
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
     widgets::window_with_margins("###users", scales::option * 4, scales::slight_space_between_widgets, colors::child, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-    /*
-     * sample data
-     */
-    for (int i = 0; i <= 20; ++i)
-    {
-        std::string member_demo = "user nº" + std::to_string(i);
+    static bool refresh_events = false;
 
-        if (widgets::foot_button(member_demo))
-        {
-            go_to_tab(tab_t::_user_info);
-            //values::current_member = member_t(std::to_string(i), member_demo, "6736723472374", member_t::dance_type_e::hakken_gabber);
-        }
+    if (!refresh_events)
+    {
+        values::current_members = api_rest_fetch::get_members();
+        refresh_events = true;
     }
+
+    for (member_t member : values::current_members)
+        widgets::user(member, tab_t::_user_info);
 
     widgets::end_window_with_margins(scales::slight_space_between_widgets);
 
@@ -734,4 +738,17 @@ ImVec2 menu::values::get_font_size(ImFont *font) noexcept
     ImGui::PopFont();
 
     return size;
+}
+
+void menu::helper::erase_array_data(char *arr) noexcept { strcpy(arr, ""); }
+
+bool menu::helper::validate_field(const char *field) noexcept {return std::strlen(field) > 0;}
+
+bool menu::helper::validate_fields(std::vector<const char*> fields) noexcept
+{
+    for (auto field : fields)
+        if (!validate_field(field))
+            return false;
+
+    return true;
 }

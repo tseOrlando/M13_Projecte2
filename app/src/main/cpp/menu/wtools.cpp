@@ -174,12 +174,7 @@ const char* wtools::combo(ImFont* font, const char *label, const char* preview_v
 /*
  * Tries to make the user curiosity by cropping the text in half and adding 3 dots
  */
-std::string wtools::get_curiosity_text(const std::string &text) noexcept
-{
-    float text_size_x = ImGui::CalcTextSize(text.c_str()).x;
-
-    return (text_size_x > ImGui::GetContentRegionAvail().x ? text.substr(0, static_cast<int>(text.length() / 1.5)) + "..." : text);
-}
+std::string wtools::get_curiosity_text(const std::string &text) noexcept { return (text.length() > 15 ? text.substr(0, 15) + "..." : text); }
 /*
  * This function just aligns to the margin the menu has as a global
  * value so it's hardcoded, just to get the control of what the function
