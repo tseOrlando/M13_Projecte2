@@ -51,7 +51,7 @@ std::string  api_rest_fetch::_delete(const std::string& endpoint) noexcept { ret
 
 std::string api_rest_fetch::_put(const std::string &endpoint, const std::string& data) noexcept { return generate_request(endpoint, "PUT", data); }
 
-std::string api_rest_fetch::get_latest_id(const std::string &from) noexcept { return _get("/" + from + "/latest"); }
+std::string api_rest_fetch::get_latest_id_to_give(const std::string &from) noexcept { return std::to_string(std::atoi(_get("/" + from + "/latest").c_str()) + 1); }
 
 std::vector<event_t> api_rest_fetch::get_events() noexcept
 {
@@ -68,11 +68,9 @@ event_t api_rest_fetch::get_event(const std::string &id) noexcept { return event
 
 bool api_rest_fetch::post_event(event_t event_to_post) noexcept
 {
-    int events_latest_id = std::atoi(get_latest_id("events").c_str());
-
     json j;
 
-    j["_id"]     = std::to_string(events_latest_id + 1);
+    j["_id"]     = get_latest_id_to_give("events");
     j["title"]   = event_to_post.get_title();
     j["info"]    = event_to_post.get_info();
     j["members"] = json::array();
@@ -109,7 +107,7 @@ std::vector<member_t> api_rest_fetch::get_members() noexcept
     return events_requested;
 }
 
-bool api_rest_fetch::update_member(const std::string member_id, json j) noexcept { return _put("/member/" + member_id, j.dump()).find("true") != std::string::npos; }
+bool api_rest_fetch::update_member(const std::string member_id, json j) noexcept { return _put("/update_member/" + member_id, j.dump()).find("true") != std::string::npos; }
 
 /*
  * post_member and _event could be optimized but i'm lazy to do a template and just parameter a json object
@@ -117,11 +115,9 @@ bool api_rest_fetch::update_member(const std::string member_id, json j) noexcept
  */
 bool api_rest_fetch::post_member(member_t member_to_post) noexcept
 {
-    int members_latest_id = std::atoi(get_latest_id("members").c_str());
-
     json j;
 
-    j["_id"]         = std::to_string(members_latest_id + 1);
+    j["_id"]         = get_latest_id_to_give("members");
     j["name"]        = member_to_post.get_name();
     j["number"]      = member_to_post.get_number();
     j["email"]       = member_to_post.get_e_mail();
@@ -132,7 +128,7 @@ bool api_rest_fetch::post_member(member_t member_to_post) noexcept
     return _post("/member", j.dump()).find("true") != std::string::npos;
 }
 
-std::string api_rest_fetch::delete_member(const std::string &id) noexcept { return _delete("/event/" + id); }
+bool api_rest_fetch::delete_member(const std::string &id) noexcept { return _delete("/event/" + id).find("true") != std::string::npos; }
 
 std::pair<bool, member_t> api_rest_fetch::get_member_by_name(const std::string &name) noexcept
 {
@@ -141,7 +137,7 @@ std::pair<bool, member_t> api_rest_fetch::get_member_by_name(const std::string &
     if (not requested_member_raw.contains("detail") and not requested_member_raw.contains("error"))
         return std::make_pair(true, member_t(requested_member_raw));
 
-    return std::make_pair(false, member_t("error", "error", "error", "error", "error"));
+    return std::make_pair(false, member_t("error", "error", "error", "error", "error", "error"));
 }
 
 std::vector<event_t> api_rest_fetch::get_events_from_member(const std::string member_id) noexcept
@@ -168,3 +164,5 @@ bool api_rest_fetch::join_member_to_event(const std::string member_id, const std
 
     return false;
 }
+
+bool api_rest_fetch::delete_member_by_name(const std::string &name) noexcept { return _delete("/member_deletion_by_name/" + name).find("true") != std::string::npos; }

@@ -16,7 +16,7 @@ class member_t
 public:
     enum class dance_type_e : int              { jumpstyle = 0, hakken_gabber = 1, shuffle = 2 };
 
-    member_t(const std::string &name, const std::string& password, const std::string &number, const std::string &e_mail, const std::string& dance_type) : name(name), password(password), number(number), e_mail(e_mail), dance_type(dance_type) {}
+    member_t(const std::string &id, const std::string &name, const std::string& password, const std::string &number, const std::string &e_mail, const std::string& dance_type) : id(id), name(name), password(password), number(number), e_mail(e_mail), dance_type(dance_type) {}
     member_t(json j)
     {
         id = j["_id"].get<std::string>();
@@ -30,17 +30,19 @@ public:
     member_t() {}
     virtual ~member_t() {}
 
-    const std::string &get_id() const        { return id; }
-    const std::string &get_name() const        { return name; }
-    const std::string &get_password() const      { return password; }
+    const std::string &get_id() const         { return id; }
+    const std::string &get_name() const       { return name; }
+    const std::string &get_password() const   { return password; }
+    const std::string &get_number() const     { return number; }
+    const std::string &get_e_mail() const     { return e_mail; }
+    const std::string& get_dance_type() const { return dance_type; }
 
-    const std::string &get_number() const      { return number; }
-    const std::string &get_e_mail() const      { return e_mail; }
-
-    const std::string &get_dance_type()        { return dance_type; }
+    void set_number(const std::string &_number)         { member_t::number = _number; }
+    void set_email(const std::string &_e_mail)          {e_mail = _e_mail;}
+    void set_dance_type(const std::string &_dance_type) {dance_type = _dance_type;}
 
     //in case we need it, not safe but idc xd
-    dance_type_e dance_type_native(const std::string& dance_type_)
+    static dance_type_e dance_type_native(const std::string& dance_type_)
     {
         if (dance_type_.find("jumpstyle") != std::string::npos) return dance_type_e::jumpstyle;
         else if (dance_type_.find("hakken_gabber") != std::string::npos) return dance_type_e::hakken_gabber;
@@ -73,10 +75,10 @@ public:
     event_t() {}
     virtual ~event_t() {}
 
-    const std::string &get_id()   const              { return event_t::id; }
-    const std::string &get_title() const              { return event_t::title; }
-    const std::string &get_info() const              { return event_t::info; }
-    const std::vector<std::string> &get_members() const { return event_t::members; }
+    const std::string &get_id()   const                 { return event_t::id; }
+    const std::string &get_title() const                { return event_t::title; }
+    const std::string &get_info() const                 { return event_t::info; }
+    const std::vector<std::string> &get_members() const { return event_t::members; } // wtf never used, i get them by api, for what i could use it
 
 private:
     std::string id;
@@ -100,7 +102,7 @@ namespace api_rest_fetch
     std::string  _delete(const std::string& endpoint) noexcept;
     std::string  _put(const std::string& endpoint, const std::string& data = "") noexcept;
 
-    std::string get_latest_id(const std::string &from) noexcept;
+    std::string get_latest_id_to_give(const std::string &from) noexcept;
 
     std::vector<event_t> get_events() noexcept;
     event_t get_event(const std::string& id) noexcept;
@@ -112,7 +114,8 @@ namespace api_rest_fetch
     std::vector<member_t> get_members() noexcept;
     bool update_member(const std::string member_id, json j) noexcept;
     bool post_member(member_t member_to_post) noexcept;
-    std::string delete_member(const std::string& id) noexcept;
+    bool delete_member(const std::string& id) noexcept;
+    bool delete_member_by_name(const std::string& name) noexcept;
     std::pair<bool, member_t> get_member_by_name(const std::string& name) noexcept;
     std::vector<event_t> get_events_from_member(const std::string member_id) noexcept;
 

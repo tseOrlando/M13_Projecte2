@@ -27,11 +27,13 @@ namespace menu
         void erase_array_data(char * arr) noexcept;
         bool validate_field(const char * field) noexcept;
         bool validate_fields(std::vector<const char *> fields) noexcept;
-        void auto_remove(std::vector<const char *> fields) noexcept;
+        void auto_remove(std::vector<const char *> fields, bool auto_ = false) noexcept;
 
         std::string upper(const std::string& str) noexcept;
         std::string lower(const std::string& str) noexcept;
         std::string case_(const std::string& str, std::function<int(int)> f) noexcept;
+
+        bool check_filter(const std::string& dance_to_check) noexcept;
     }
 
     namespace values
@@ -52,9 +54,12 @@ namespace menu
 
         namespace user_data
         {
+            inline std::vector<event_t> joined_events;
             inline member_t member_local;
+
             inline bool logged_in = false;
-            inline bool is_admin = false;
+            inline bool joined_already = false;
+            inline bool is_admin; //secure xdd
         }
     }
 

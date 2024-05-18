@@ -368,8 +368,6 @@ void menu::core::lobby::auth::log_in() noexcept
 
     static std::vector<const char*> fields = { user_name, pass_word };
 
-    helper::auto_remove(fields);
-
     widgets::upper_title("user login");
 
     {
@@ -394,6 +392,8 @@ void menu::core::lobby::auth::log_in() noexcept
                 {
                     values::user_data::member_local = result.second;
                     values::user_data::logged_in = true;
+                    helper::auto_remove(fields, true);
+                    values::user_data::is_admin = values::user_data::member_local.get_name() == "tese"; // lol XDDDD
                     go_to_tab(tab_t::_hub);
                 }
             }
@@ -401,6 +401,8 @@ void menu::core::lobby::auth::log_in() noexcept
 
         widgets::end_window_with_margins();
     }
+
+    helper::auto_remove(fields);
 }
 
 
@@ -416,8 +418,6 @@ void menu::core::lobby::auth::register_in() noexcept
     const char* dance;
 
     static std::vector<const char*> fields = { user_name, pass_word, number, email };
-
-    helper::auto_remove(fields);
 
     widgets::upper_title("user register");
 
@@ -441,17 +441,20 @@ void menu::core::lobby::auth::register_in() noexcept
 
         if (widgets::body_button("register"))
         {
-            member_t member_to_register(user_name, pass_word, number, email, dance);
+            member_t member_to_register(api_rest_fetch::get_latest_id_to_give("members"), user_name, pass_word, number, email, dance);
 
             if (helper::validate_fields(fields) && api_rest_fetch::post_member(member_to_register))
             {
                 values::user_data::member_local = member_to_register;
+                helper::auto_remove(fields, true);
                 go_to_tab(tab_t::_hub);
             }
         }
 
         widgets::end_window_with_margins();
     }
+
+    helper::auto_remove(fields);
 }
 
 
@@ -477,11 +480,9 @@ void menu::core::lobby::main::hub() noexcept
 
 void menu::core::lobby::main::events::events() noexcept
 {
+    values::user_data::joined_already = false;
+
     static char search_event[32] = {};
-
-    static std::vector<const char*> fields = { search_event };
-
-    helper::auto_remove(fields);
 
     widgets::upper_title("events");
 
@@ -508,8 +509,13 @@ void menu::core::lobby::main::events::events() noexcept
         }
 
         for (event_t event: values::current_events)
-            if (helper::lower(event.get_title()).find(search_event) != std::string::npos)
+        {
+            std::vector<std::string> members_of_the_event = event.get_members();
+            auto it = std::find(members_of_the_event.begin(), members_of_the_event.end(), values::user_data::member_local.get_id());
+
+            if (helper::lower(event.get_title()).find(search_event) != std::string::npos && it == members_of_the_event.end())
                 widgets::event(event);
+        }
 
         widgets::end_window_with_margins(scales::slight_space_between_widgets);
     }
@@ -557,11 +563,11 @@ void menu::core::lobby::main::events::event_info() noexcept
         wtools::align();
         widgets::foot_text(values::current_event.get_info(), true, false, false);
 
-        widgets::end_window_with_margins(scales::margin * 3.5);
+        widgets::end_window_with_margins(scales::margin * 2.5);
     }
 
     {
-        widgets::window_with_margins("###members", scales::option * 2);
+        widgets::window_with_margins("###members", scales::option * (values::user_data::joined_already ? 1 : 2)); // this is retard but idk it works
 
         if (widgets::body_button("members"))
         {
@@ -570,10 +576,10 @@ void menu::core::lobby::main::events::event_info() noexcept
             go_to_tab(tab_t::_event_members);
         }
 
-        if (widgets::body_button("join"))
-            if (api_rest_fetch::join_member_to_event(values::user_data::member_local.get_id(),
-                                                     values::current_event.get_id()))
-                go_back();
+        if (!values::user_data::joined_already)
+            if (widgets::body_button("join"))
+                if (api_rest_fetch::join_member_to_event(values::user_data::member_local.get_id(), values::current_event.get_id()))
+                    go_back();
 
         widgets::end_window_with_margins();
     }
@@ -584,8 +590,6 @@ void menu::core::lobby::main::events::members::event_members() noexcept
     static char search_member[32] = {};
 
     static std::vector<const char*> fields = { search_member };
-
-    helper::auto_remove(fields);
 
     widgets::upper_title("members");
 
@@ -600,12 +604,19 @@ void menu::core::lobby::main::events::members::event_members() noexcept
         widgets::window_with_margins("###members_names", scales::option * 6,
                                      scales::slight_space_between_widgets);
 
-        for (member_t member: values::current_members)
-            if (helper::lower(member.get_name()).find(search_member) != std::string::npos)
+        for (const auto& member : values::current_members)
+        {
+            const auto& member_name = helper::lower(member.get_name());
+            const auto& local_member_name = helper::lower(values::user_data::member_local.get_name());
+
+            if (member_name.find(search_member) != std::string::npos && member_name.find(local_member_name) == std::string::npos)
                 widgets::user(member, tab_t::_member_info);
+        }
 
         widgets::end_window_with_margins();
     }
+
+    helper::auto_remove(fields);
 }
 
 void menu::core::lobby::main::events::members::member_info() noexcept
@@ -620,6 +631,16 @@ void menu::core::lobby::main::events::members::member_info() noexcept
         widgets::info_block(values::current_member.get_number());
         widgets::info_block(values::current_member.get_dance_type());
 
+        widgets::end_window_with_margins(scales::margin * 4);
+    }
+
+    {
+        widgets::window_with_margins("###member_deletion", scales::option, scales::margin_before_title);
+
+        if (widgets::body_button("delete"))
+            if (api_rest_fetch::delete_member_by_name(values::current_member.get_name()))
+                go_back();
+
         widgets::end_window_with_margins();
     }
 }
@@ -630,8 +651,6 @@ void menu::core::lobby::main::events::create_event() noexcept
     static char event_info[255]  = {};
 
     static std::vector<const char*> fields = { event_title, event_info };
-
-    helper::auto_remove(fields);
 
     float default_scale = scales::margin_before_title;
 
@@ -663,6 +682,8 @@ void menu::core::lobby::main::events::create_event() noexcept
 
         widgets::end_window_with_margins();
     }
+
+    helper::auto_remove(fields);
 }
 
 void menu::core::lobby::main::events::joined_events() noexcept
@@ -670,8 +691,6 @@ void menu::core::lobby::main::events::joined_events() noexcept
     static char search_joined_event[32] = {};
 
     static std::vector<const char*> fields = { search_joined_event };
-
-    helper::auto_remove(fields);
 
     widgets::upper_title("joined events");
 
@@ -692,10 +711,15 @@ void menu::core::lobby::main::events::joined_events() noexcept
 
         for (event_t event: values::current_events)
             if (helper::lower(event.get_title()).find(search_joined_event) != std::string::npos)
+            {
+                values::user_data::joined_already = true;
                 widgets::event(event);
+            }
 
         widgets::end_window_with_margins();
     }
+
+    helper::auto_remove(fields);
 }
 
 void menu::core::lobby::main::search::search() noexcept
@@ -703,10 +727,6 @@ void menu::core::lobby::main::search::search() noexcept
     widgets::upper_title("search");
 
     static char search_user[32] = {};
-
-    static std::vector<const char*> fields = { search_user };
-
-    helper::auto_remove(fields);
 
     {
         widgets::window_with_margins("###search_user", scales::input, scales::margin_before_title);
@@ -716,7 +736,7 @@ void menu::core::lobby::main::search::search() noexcept
         widgets::end_window_with_margins(scales::slight_space_between_widgets);
     }
 
-    static bool refresh_events = false;
+    static bool refresh_members = false;
 
     {
         widgets::window_with_margins("###users", scales::option * 4,
@@ -724,14 +744,20 @@ void menu::core::lobby::main::search::search() noexcept
                                      ImGuiChildFlags_None,
                                      ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-        if (!refresh_events)
+        if (!refresh_members)
         {
             values::current_members = api_rest_fetch::get_members();
-            refresh_events = true;
+            refresh_members = true;
         }
 
-        for (member_t member: values::current_members)
-            widgets::user(member, tab_t::_user_info);
+        for (const auto& member : values::current_members)
+        {
+            const auto& member_name = helper::lower(member.get_name());
+            const auto& local_member_name = helper::lower(values::user_data::member_local.get_name());
+
+            if (member_name.find(search_user) != std::string::npos && member_name.find(local_member_name) == std::string::npos && helper::check_filter(member.get_dance_type()))
+                widgets::user(member, tab_t::_user_info);
+        }
 
         widgets::end_window_with_margins(scales::slight_space_between_widgets);
     }
@@ -740,7 +766,10 @@ void menu::core::lobby::main::search::search() noexcept
         widgets::window_with_margins("###search_options", scales::option, scales::margin * 4);
 
         if (widgets::body_button("filter"))
+        {
+            refresh_members = false;
             go_to_tab(tab_t::_filter);
+        }
 
         widgets::end_window_with_margins();
     }
@@ -787,7 +816,7 @@ void menu::core::lobby::main::user::user() noexcept
     widgets::upper_title("user");
 
     {
-        widgets::window_with_margins("###user_info_local", scales::info * 3,
+        widgets::window_with_margins("###user_info_local", scales::info * 4,
                                      scales::margin_before_title);
 
         widgets::info_block(values::user_data::member_local.get_name());
@@ -799,10 +828,20 @@ void menu::core::lobby::main::user::user() noexcept
     }
 
     {
-        widgets::window_with_margins("###edit_info", scales::option);
+        widgets::window_with_margins("###edit_info", scales::option * (values::user_data::is_admin ? 3 : 2));
 
         if (widgets::body_button("edit"))
             go_to_tab(tab_t::_edit_user_info);
+
+        if (widgets::body_button("log off"))
+        {
+            values::user_data::is_admin = false;
+            go_to_tab(tab_t::_landing);
+        }
+
+        if (values::user_data::is_admin && widgets::body_button("admin"))
+            go_to_tab(tab_t::_admin_panel);
+
 
         widgets::end_window_with_margins();
     }
@@ -820,6 +859,17 @@ void menu::core::lobby::main::user::edit_user_info() noexcept
 
     helper::auto_remove(fields);
 
+    static bool add_once = false;
+    static const char *current_value;
+
+    if (!add_once)
+    {
+        strcpy(email, values::user_data::member_local.get_e_mail().c_str());
+        strcpy(number, values::user_data::member_local.get_number().c_str());
+        current_value = values::user_data::member_local.get_dance_type().c_str();
+        add_once = true;
+    }
+
     {
         widgets::window_with_margins("###edit_panel", scales::info * 3,
                                      scales::margin_before_title);
@@ -828,7 +878,6 @@ void menu::core::lobby::main::user::edit_user_info() noexcept
         widgets::input(number, sizeof number, "number..");
         widgets::input(email, sizeof email, "e-mail..");
 
-        static const char *current_value = "type of dance";
         current_value = dance = widgets::combo("###dances", current_value, values::dances);
 
         widgets::end_window_with_margins(scales::margin * 4);
@@ -843,10 +892,20 @@ void menu::core::lobby::main::user::edit_user_info() noexcept
 
             j["number"] = number;
             j["email"] = email;
+            j["dance_type"] = dance;
 
             if (api_rest_fetch::update_member(values::user_data::member_local.get_id(), j))
+            {
+                add_once = false;
+                values::user_data::member_local.set_number(number);
+                values::user_data::member_local.set_email(email);
+                values::user_data::member_local.set_dance_type(dance);
                 go_back();
+            }
         }
+
+        if (change_tab)
+            add_once = false;
 
         widgets::end_window_with_margins();
     }
@@ -854,13 +913,34 @@ void menu::core::lobby::main::user::edit_user_info() noexcept
 
 void menu::core::lobby::main::user::admin_panel() noexcept
 {
+    static char search_user[32] = {};
+
+    static std::vector<const char *> fields = {search_user};
+
     widgets::upper_title("admin panel");
 
-    widgets::window_with_margins("###admin_panel", scales::info * 3, scales::margin_before_title);
+    {
+        widgets::window_with_margins("###admin_panel", scales::input, scales::margin_before_title);
 
-    //... soon
+        widgets::input(search_user, sizeof search_user, "member name..", false, ICON_FA_SEARCH);
 
-    widgets::end_window_with_margins(scales::margin * 4);
+        widgets::end_window_with_margins(scales::margin * 10);
+    }
+
+    {
+        widgets::window_with_margins("###admin_delete", scales::option,scales::margin_before_title);
+
+        if (widgets::body_button("delete"))
+            if (helper::validate_field(search_user) && api_rest_fetch::delete_member_by_name(search_user))
+            {
+                helper::auto_remove(fields, true);
+                go_back();
+            }
+
+        widgets::end_window_with_margins();
+    }
+
+    helper::auto_remove(fields);
 }
 
 ImVec2 menu::values::get_font_size(ImFont *font) noexcept
@@ -885,9 +965,11 @@ bool menu::helper::validate_fields(std::vector<const char*> fields) noexcept
     return true;
 }
 
-void menu::helper::auto_remove(std::vector<const char *> fields) noexcept
+void menu::helper::auto_remove(std::vector<const char *> fields, bool auto_) noexcept
 {
-    if (menu::core::change_tab)
+    bool what_to_react = !auto_ ? menu::core::change_tab : auto_;
+
+    if (what_to_react)
         for (auto field : fields)
             erase_array_data(const_cast<char*>(field));
 }
@@ -905,3 +987,14 @@ std::string menu::helper::case_(const std::string& str, std::function<int(int)> 
 std::string menu::helper::lower(const std::string& str) noexcept { return case_(str, tolower); }
 
 std::string menu::helper::upper(const std::string& str) noexcept { return case_(str, toupper); }
+
+bool menu::helper::check_filter(const std::string& dance_to_check) noexcept
+{
+    std::map<bool, std::string> dances_active = { {values::jumpstyle_filter, values::dances[0]}, {values::hakken_filter, values::dances[1]}, {values::shuffle_filter, values::dances[2]} };
+
+    for (auto const & [active, dance_name] : dances_active)
+        if (active && dance_name.find(dance_to_check) == std::string::npos)
+            return false;
+
+    return true;
+}
