@@ -59,7 +59,7 @@ private:
 class event_t
 {
 public:
-    event_t(const std::string &title, const std::string &info, const std::vector<std::string> &members = {}): id(id), title(title), info(info), members(members) {}
+    event_t(const std::string &title, const std::string &info, const std::vector<std::string> &members = {}): title(title), info(info), members(members) {}
     event_t(json j)
     {
         id    = j["_id"].get<std::string>();
@@ -89,14 +89,16 @@ namespace api_rest_fetch
 {
     inline std::string base_url = "http://192.168.0.26:8000";
 
+    inline void change_host(const std::string& host) noexcept;
+
     size_t write_callback(void *contents, size_t size, size_t nmemb, std::string *response) noexcept;
 
-    std::string  generate_request(const std::string& endpoint, const std::string& request_type, const std::string& post_data = "") noexcept;
+    std::string  generate_request(const std::string& endpoint, const std::string& request_type, const std::string& data = "") noexcept;
 
     std::string  _get(const std::string& endpoint) noexcept;
     std::string  _post(const std::string& endpoint, const std::string& data) noexcept;
     std::string  _delete(const std::string& endpoint) noexcept;
-    std::string  _put(const std::string& endpoint) noexcept;
+    std::string  _put(const std::string& endpoint, const std::string& data = "") noexcept;
 
     std::string get_latest_id(const std::string &from) noexcept;
 
@@ -108,6 +110,7 @@ namespace api_rest_fetch
 
     member_t get_member(const std::string& id) noexcept;
     std::vector<member_t> get_members() noexcept;
+    bool update_member(const std::string member_id, json j) noexcept;
     bool post_member(member_t member_to_post) noexcept;
     std::string delete_member(const std::string& id) noexcept;
     std::pair<bool, member_t> get_member_by_name(const std::string& name) noexcept;

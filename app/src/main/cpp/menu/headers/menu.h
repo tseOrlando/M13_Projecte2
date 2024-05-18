@@ -27,14 +27,19 @@ namespace menu
         void erase_array_data(char * arr) noexcept;
         bool validate_field(const char * field) noexcept;
         bool validate_fields(std::vector<const char *> fields) noexcept;
+        void auto_remove(std::vector<const char *> fields) noexcept;
+
+        std::string upper(const std::string& str) noexcept;
+        std::string lower(const std::string& str) noexcept;
+        std::string case_(const std::string& str, std::function<int(int)> f) noexcept;
     }
 
     namespace values
     {
-        inline std::vector<const char *> dances = {"jumpstyle", "hakken_gabber", "shuffle" };
+        inline std::vector<const char *> dances = {"jumpstyle", "hakken", "shuffle" };
 
         inline bool jumpstyle_filter     = false;
-        inline bool hakken_gabber_filter = false;
+        inline bool hakken_filter = false;
         inline bool shuffle_filter       = false;
 
         inline std::vector<event_t> current_events;
@@ -47,14 +52,7 @@ namespace menu
 
         namespace user_data
         {
-            inline char user_name[16] = {};
-            inline char pass_word[16] = {};
-            inline char e_mail[32]    = {};
-            inline char number[10]     = {};
-            inline const char* dance;
-
             inline member_t member_local;
-
             inline bool logged_in = false;
             inline bool is_admin = false;
         }

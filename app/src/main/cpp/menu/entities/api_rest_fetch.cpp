@@ -3,6 +3,7 @@
 //
 
 #include "api_rest_fetch.h"
+void api_rest_fetch::change_host(const std::string &host) noexcept {base_url = "http://" + host + ":8000";}
 
 size_t api_rest_fetch::write_callback(void *contents, size_t size, size_t nmemb, std::string *response) noexcept
 {
@@ -11,7 +12,7 @@ size_t api_rest_fetch::write_callback(void *contents, size_t size, size_t nmemb,
     return total_size;
 }
 
-std::string api_rest_fetch::generate_request(const std::string &endpoint, const std::string &request_type, const std::string& post_data) noexcept
+std::string api_rest_fetch::generate_request(const std::string &endpoint, const std::string &request_type, const std::string& data) noexcept
 {
     CURL *curl = curl_easy_init();
     CURLcode res;
@@ -28,8 +29,8 @@ std::string api_rest_fetch::generate_request(const std::string &endpoint, const 
         headers = curl_slist_append(headers, "Content-Type: application/json");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-        if (request_type == "POST")
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_data.c_str());
+        if (request_type == "POST" || request_type == "PUT")
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
         res = curl_easy_perform(curl);
 
@@ -48,7 +49,7 @@ std::string  api_rest_fetch::_post(const std::string& endpoint, const std::strin
 
 std::string  api_rest_fetch::_delete(const std::string& endpoint) noexcept { return generate_request(endpoint, "DELETE"); }
 
-std::string api_rest_fetch::_put(const std::string &endpoint) noexcept { return generate_request(endpoint, "PUT"); }
+std::string api_rest_fetch::_put(const std::string &endpoint, const std::string& data) noexcept { return generate_request(endpoint, "PUT", data); }
 
 std::string api_rest_fetch::get_latest_id(const std::string &from) noexcept { return _get("/" + from + "/latest"); }
 
@@ -88,8 +89,9 @@ std::vector<member_t> api_rest_fetch::get_members_from_event(const std::string e
     json data_requested = json::parse(_get("/event_members/" + event_id));
 
     if (data_requested.contains("members"))
-        for (const auto& member_id : data_requested["members"])
-            members_requested.push_back(get_member(member_id));
+        if (data_requested["members"].size() > 0)
+            for (const auto& member_data : data_requested["members"])
+                members_requested.push_back(member_t(member_data));
 
     return members_requested;
 }
@@ -106,6 +108,8 @@ std::vector<member_t> api_rest_fetch::get_members() noexcept
 
     return events_requested;
 }
+
+bool api_rest_fetch::update_member(const std::string member_id, json j) noexcept { return _put("/member/" + member_id, j.dump()).find("true") != std::string::npos; }
 
 /*
  * post_member and _event could be optimized but i'm lazy to do a template and just parameter a json object
@@ -130,7 +134,7 @@ bool api_rest_fetch::post_member(member_t member_to_post) noexcept
 
 std::string api_rest_fetch::delete_member(const std::string &id) noexcept { return _delete("/event/" + id); }
 
-std::pair<bool, member_t>  api_rest_fetch::get_member_by_name(const std::string &name) noexcept
+std::pair<bool, member_t> api_rest_fetch::get_member_by_name(const std::string &name) noexcept
 {
     json requested_member_raw = json::parse(_get("/member_name/" + name));
 
@@ -147,8 +151,9 @@ std::vector<event_t> api_rest_fetch::get_events_from_member(const std::string me
     json data_requested = json::parse(_get("/member_events/" + member_id));
 
     if (data_requested.contains("events"))
-        for (const auto& event_id : data_requested["events"])
-            events_requested.push_back(get_event(member_id));
+        if (data_requested["events"].size() > 0)
+            for (const auto& event_data : data_requested["events"])
+                events_requested.push_back(event_t(event_data));
 
     return events_requested;
 }
