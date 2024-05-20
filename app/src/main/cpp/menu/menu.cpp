@@ -276,7 +276,6 @@ void menu::core::go_to_tab(tab_t tab) noexcept
 
         case _user: lobby::main::user::user();                               break;
         case _edit_user_info: lobby::main::user::edit_user_info();           break;
-        case _admin_panel: lobby::main::user::admin_panel();                 break;
         default:                                                             break;
     }
 }
@@ -298,7 +297,7 @@ void menu::core::go_back() noexcept
             go_to_tab(_landing);
             break;
 
-        case _hub:
+        case _hub: // retarded option kekekekekeeke
             //go_to_tab(_landing); when logged in and we want to log off after
             break;
 
@@ -330,7 +329,6 @@ void menu::core::go_back() noexcept
             break;
 
         case _edit_user_info:
-        case _admin_panel:
             go_to_tab(_user);
             break;
     }
@@ -494,18 +492,16 @@ void menu::core::lobby::main::events::events() noexcept
         widgets::end_window_with_margins(scales::slight_space_between_widgets);
     }
 
-    static bool refresh_events = false;
-
     {
         widgets::window_with_margins("###events", scales::option * 4,
                                      scales::slight_space_between_widgets, colors::child,
                                      ImGuiChildFlags_None,
                                      ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-        if (!refresh_events)
+        if (values::refresh_events)
         {
             values::current_events = api_rest_fetch::get_events();
-            refresh_events = true;
+            values::refresh_events = false;
         }
 
         for (event_t event: values::current_events)
@@ -519,36 +515,41 @@ void menu::core::lobby::main::events::events() noexcept
 
         widgets::end_window_with_margins(scales::slight_space_between_widgets);
     }
+
     {
         widgets::window_with_margins("###events_options", scales::option * 2,
                                      scales::slight_space_between_widgets);
 
         if (widgets::body_button("create"))
         {
-            refresh_events = false;
+            values::refresh_events = true;
             go_to_tab(tab_t::_create_event);
         }
 
         if (widgets::body_button("joined"))
         {
-            refresh_events = false;
-            values::current_events = api_rest_fetch::get_events_from_member(
-                    values::user_data::member_local.get_id());
+            values::refresh_events = true;
+            values::current_events = api_rest_fetch::get_events_from_member(values::user_data::member_local.get_id());
             go_to_tab(tab_t::_joined_events);
         }
 
         widgets::end_window_with_margins();
     }
+
+    if (change_tab)
+        values::refresh_events = true;
 }
 
 void menu::core::lobby::main::events::event_info() noexcept
 {
+    bool admin = values::user_data::is_admin;
+    bool joined = values::user_data::joined_already;
+
     widgets::upper_title("event info");
 
     float body_size_y_with_pad = values::get_font_size(font::body).y + 10.f;
     {
-        widgets::window_with_margins("###event_title", body_size_y_with_pad,
-                                     scales::margin_before_title);
+        widgets::window_with_margins("###event_title", body_size_y_with_pad, admin ? scales::margin : scales::margin_before_title);
 
         widgets::body_text(values::current_event.get_title());
 
@@ -563,23 +564,37 @@ void menu::core::lobby::main::events::event_info() noexcept
         wtools::align();
         widgets::foot_text(values::current_event.get_info(), true, false, false);
 
-        widgets::end_window_with_margins(scales::margin * 2.5);
+        widgets::end_window_with_margins(scales::slight_space_between_widgets);
     }
 
     {
-        widgets::window_with_margins("###members", scales::option * (values::user_data::joined_already ? 1 : 2)); // this is retard but idk it works
+        int option_count = 2 + (admin ? 1 : 0);
+
+        widgets::window_with_margins("###members", scales::option * (joined ? option_count - 1 : option_count)); // this is retard but idk it works
+
+        std::string current_event_id = values::current_event.get_id();
 
         if (widgets::body_button("members"))
         {
-            values::current_members = api_rest_fetch::get_members_from_event(
-                    values::current_event.get_id());
+            values::current_members = api_rest_fetch::get_members_from_event(current_event_id);
             go_to_tab(tab_t::_event_members);
         }
 
-        if (!values::user_data::joined_already)
+        if (!joined)
             if (widgets::body_button("join"))
-                if (api_rest_fetch::join_member_to_event(values::user_data::member_local.get_id(), values::current_event.get_id()))
+                if (api_rest_fetch::join_member_to_event(values::user_data::member_local.get_id(), current_event_id))
+                {
+                    values::refresh_events = true;
                     go_back();
+                }
+
+        if (admin)
+            if (widgets::body_button("delete"))
+            {
+                values::refresh_events = true;
+                api_rest_fetch::delete_event(current_event_id);
+                go_back();
+            }
 
         widgets::end_window_with_margins();
     }
@@ -639,7 +654,10 @@ void menu::core::lobby::main::events::members::member_info() noexcept
 
         if (widgets::body_button("delete"))
             if (api_rest_fetch::delete_member_by_name(values::current_member.get_name()))
+            {
+                values::refresh_members = true;
                 go_back();
+            }
 
         widgets::end_window_with_margins();
     }
@@ -672,9 +690,9 @@ void menu::core::lobby::main::events::create_event() noexcept
 
         if (widgets::body_button("upload"))
             if (helper::validate_fields({event_title, event_info}))
-                if (api_rest_fetch::post_event(
-                        event_t(std::string(event_title), std::string(event_info))))
+                if (api_rest_fetch::post_event(event_t(std::string(event_title), std::string(event_info))))
                 {
+                    values::refresh_members = true;
                     helper::erase_array_data(event_title);
                     helper::erase_array_data(event_info);
                     go_to_tab(tab_t::_events);
@@ -736,18 +754,16 @@ void menu::core::lobby::main::search::search() noexcept
         widgets::end_window_with_margins(scales::slight_space_between_widgets);
     }
 
-    static bool refresh_members = false;
-
     {
         widgets::window_with_margins("###users", scales::option * 4,
                                      scales::slight_space_between_widgets, colors::child,
                                      ImGuiChildFlags_None,
                                      ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-        if (!refresh_members)
+        if (values::refresh_members)
         {
             values::current_members = api_rest_fetch::get_members();
-            refresh_members = true;
+            values::refresh_members = false;
         }
 
         for (const auto& member : values::current_members)
@@ -767,7 +783,7 @@ void menu::core::lobby::main::search::search() noexcept
 
         if (widgets::body_button("filter"))
         {
-            refresh_members = false;
+            values::refresh_members = true;
             go_to_tab(tab_t::_filter);
         }
 
@@ -787,25 +803,56 @@ void menu::core::lobby::main::search::user::user_info() noexcept
         widgets::info_block(values::current_member.get_number());
         widgets::info_block(values::current_member.get_dance_type());
 
+        widgets::end_window_with_margins(scales::margin * 4);
+    }
+
+    {
+        widgets::window_with_margins("###admin_delete", scales::option,scales::margin_before_title);
+
+        if (widgets::body_button("delete"))
+            if (api_rest_fetch::delete_member_by_name(values::current_member.get_name()))
+            {
+                values::refresh_members = true;
+                go_back();
+            }
+
         widgets::end_window_with_margins();
     }
 }
 
 void menu::core::lobby::main::search::filter() noexcept
 {
+    /*
+     * ported from my old kappa ImGui project
+     */
+    auto handled_checkbox = [&](const char* label, bool& flag)
+    {
+        if (widgets::checkbox(label, &flag, false))
+        {
+            if (flag)
+            {
+                values::jumpstyle_filter = false;
+                values::hakken_filter = false;
+                values::shuffle_filter = false;
+                flag = true;
+            }
+            else flag = false;
+        }
+    };
+
     widgets::upper_title("filter");
 
     {
         widgets::window_with_margins("###filter_options", scales::option * 2, scales::margin * 7);
 
         wtools::align();
-        widgets::checkbox("jumpstyle", &values::jumpstyle_filter, false);
+        handled_checkbox("jumpstyle", values::jumpstyle_filter);
 
         wtools::align();
-        widgets::checkbox("hakken", &values::hakken_filter, false);
+        handled_checkbox("hakken", values::hakken_filter);
 
         wtools::align();
-        widgets::checkbox("shuffle", &values::shuffle_filter, false);
+        handled_checkbox("shuffle", values::shuffle_filter);
 
         widgets::end_window_with_margins();
     }
@@ -828,7 +875,7 @@ void menu::core::lobby::main::user::user() noexcept
     }
 
     {
-        widgets::window_with_margins("###edit_info", scales::option * (values::user_data::is_admin ? 3 : 2));
+        widgets::window_with_margins("###edit_info", scales::option * 2);
 
         if (widgets::body_button("edit"))
             go_to_tab(tab_t::_edit_user_info);
@@ -838,10 +885,6 @@ void menu::core::lobby::main::user::user() noexcept
             values::user_data::is_admin = false;
             go_to_tab(tab_t::_landing);
         }
-
-        if (values::user_data::is_admin && widgets::body_button("admin"))
-            go_to_tab(tab_t::_admin_panel);
-
 
         widgets::end_window_with_margins();
     }
@@ -909,38 +952,6 @@ void menu::core::lobby::main::user::edit_user_info() noexcept
 
         widgets::end_window_with_margins();
     }
-}
-
-void menu::core::lobby::main::user::admin_panel() noexcept
-{
-    static char search_user[32] = {};
-
-    static std::vector<const char *> fields = {search_user};
-
-    widgets::upper_title("admin panel");
-
-    {
-        widgets::window_with_margins("###admin_panel", scales::input, scales::margin_before_title);
-
-        widgets::input(search_user, sizeof search_user, "member name..", false, ICON_FA_SEARCH);
-
-        widgets::end_window_with_margins(scales::margin * 10);
-    }
-
-    {
-        widgets::window_with_margins("###admin_delete", scales::option,scales::margin_before_title);
-
-        if (widgets::body_button("delete"))
-            if (helper::validate_field(search_user) && api_rest_fetch::delete_member_by_name(search_user))
-            {
-                helper::auto_remove(fields, true);
-                go_back();
-            }
-
-        widgets::end_window_with_margins();
-    }
-
-    helper::auto_remove(fields);
 }
 
 ImVec2 menu::values::get_font_size(ImFont *font) noexcept

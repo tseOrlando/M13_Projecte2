@@ -47,6 +47,9 @@ namespace menu
         inline std::vector<event_t> current_events;
         inline std::vector<member_t> current_members;
 
+        inline bool refresh_events = true;
+        inline bool refresh_members = true;
+
         inline event_t current_event;
         inline member_t current_member;
 
@@ -183,7 +186,6 @@ namespace menu
                 {
                     void              user() noexcept;
                     void    edit_user_info() noexcept;
-                    void       admin_panel() noexcept;
                 }
             }
         }

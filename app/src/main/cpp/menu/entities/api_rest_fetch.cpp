@@ -3,6 +3,7 @@
 //
 
 #include "api_rest_fetch.h"
+
 void api_rest_fetch::change_host(const std::string &host) noexcept {base_url = "http://" + host + ":8000";}
 
 size_t api_rest_fetch::write_callback(void *contents, size_t size, size_t nmemb, std::string *response) noexcept
@@ -75,10 +76,10 @@ bool api_rest_fetch::post_event(event_t event_to_post) noexcept
     j["info"]    = event_to_post.get_info();
     j["members"] = json::array();
 
-    return _post("/event", j.dump()).find("true") != std::string::npos;
+    return check_for_true_operation(_post("/event", j.dump()));
 }
 
-std::string api_rest_fetch::delete_event(const std::string &id) noexcept { return _delete("/event/" + id); }
+bool api_rest_fetch::delete_event(const std::string &id) noexcept { return multiple_check_operation(json::parse(_delete("/event/" + id))); }
 
 std::vector<member_t> api_rest_fetch::get_members_from_event(const std::string event_id) noexcept
 {
@@ -107,7 +108,7 @@ std::vector<member_t> api_rest_fetch::get_members() noexcept
     return events_requested;
 }
 
-bool api_rest_fetch::update_member(const std::string member_id, json j) noexcept { return _put("/update_member/" + member_id, j.dump()).find("true") != std::string::npos; }
+bool api_rest_fetch::update_member(const std::string member_id, json j) noexcept { return check_for_true_operation(_put("/update_member/" + member_id, j.dump())); }
 
 /*
  * post_member and _event could be optimized but i'm lazy to do a template and just parameter a json object
@@ -125,7 +126,7 @@ bool api_rest_fetch::post_member(member_t member_to_post) noexcept
     j["password"]    = member_to_post.get_password();
     j["events"]      = json::array();
 
-    return _post("/member", j.dump()).find("true") != std::string::npos;
+    return check_for_true_operation(_post("/member", j.dump()));
 }
 
 bool api_rest_fetch::delete_member(const std::string &id) noexcept { return _delete("/event/" + id).find("true") != std::string::npos; }
@@ -154,15 +155,17 @@ std::vector<event_t> api_rest_fetch::get_events_from_member(const std::string me
     return events_requested;
 }
 
-bool api_rest_fetch::join_member_to_event(const std::string member_id, const std::string event_id) noexcept
-{
-    json result = json::parse(_put("/member/" + member_id + "/join/" + event_id));
+bool api_rest_fetch::join_member_to_event(const std::string member_id, const std::string event_id) noexcept { return multiple_check_operation(json::parse(_put("/member/" + member_id + "/join/" + event_id))); }
 
+bool api_rest_fetch::delete_member_by_name(const std::string &name) noexcept { return check_for_true_operation(_delete("/member_deletion_by_name/" + name)); }
+
+bool api_rest_fetch::multiple_check_operation(json result)
+{
     if (result.contains("true"))
-        if (result["true"] == "true")
+        if (result["true"].get<bool>())
             return true;
 
     return false;
 }
 
-bool api_rest_fetch::delete_member_by_name(const std::string &name) noexcept { return _delete("/member_deletion_by_name/" + name).find("true") != std::string::npos; }
+bool api_rest_fetch::check_for_true_operation(const std::string result) { return result.find("true") != std::string::npos; }

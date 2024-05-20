@@ -107,7 +107,7 @@ namespace api_rest_fetch
     std::vector<event_t> get_events() noexcept;
     event_t get_event(const std::string& id) noexcept;
     bool post_event(event_t event_to_post) noexcept;
-    std::string delete_event(const std::string& id) noexcept;
+    bool delete_event(const std::string& id) noexcept;
     std::vector<member_t> get_members_from_event(const std::string event_id) noexcept;
 
     member_t get_member(const std::string& id) noexcept;
@@ -120,6 +120,9 @@ namespace api_rest_fetch
     std::vector<event_t> get_events_from_member(const std::string member_id) noexcept;
 
     bool join_member_to_event(const std::string member_id, const std::string event_id) noexcept;
+
+    bool multiple_check_operation(json result);
+    bool check_for_true_operation(const std::string result);
 }
 
 #endif //HARD_MOTION_API_REST_FETCH_H
